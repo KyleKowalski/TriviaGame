@@ -32,15 +32,15 @@ $(document).ready(function() {
 
 ////////////////////////////////////////// above block not seeming to work yet ///////////////////////////////////////////
 
-	var generalQuestions = {
-		gen1: {
+	var generalQuestionsMultipleChoice = {
+		genmc1: {
 			question:"What's my name bitch?",
 			answer:"Uhh... uhh... Kyle",
 			fakeAnswer1:"Kyle..?",
 			fakeAnswer2:"Yo daddy.",
 			fakeAnswer3:"The trivia master"
 		},
-		gen2: {
+		genmc2: {
 			question:"What's my favorite color?",
 			answer:"Green",
 			fakeAnswer1:"Yellow",
@@ -49,13 +49,34 @@ $(document).ready(function() {
 		}
 	}
 
-	var geographyQuestions = {
-		geo1: {
+	var generalQuestionsFillInTheBlank = {
+		genfitb1: {
+			question:"What's my name bitch?",
+			answer:"Kyle"
+		},
+		genfitb2: {
+			question:"What's my favorite color?",
+			answer:"Green",
+			fakeAnswer1:"Yellow",
+			fakeAnswer2:"Pink",
+			fakeAnswer3:"Go choke on a pancake"
+		}
+	}
+
+	var geographyQuestionsMultipleChoice = {
+		geomc1: {
 			question:"Where is Colorado?",
 			answer:"In the middle of the United States",
 			fakeAnswer1:"It's a figment of your imagination",
 			fakeAnswer2:"Where we all are",
 			fakeAnswer3:"Everywhere."
+		}
+	}
+
+	var geographyQuestionsFillInTheBlank = {
+		geofitb1: {
+			question:"Spell Colorado?",
+			answer:"Colorado"
 		}
 	}
 
@@ -78,8 +99,17 @@ $(document).ready(function() {
 		// TODO teams
 		// TODO team members
 		allowFillInTheBlank:false,
-		timer:30 // assume seconds - 0 is 'infinite', otherwise just seconds
+		timer:30, // assume seconds - 0 is 'infinite', otherwise just seconds
+		round: {
+			question:"",
+			answer:"",
+			fakeAnswer1:"",
+			fakeAnswer2:"",
+			fakeAnswer3:""
+		}
 	}
+
+
 
 	// TODO:  Advanced setup:  
 		// Setup Teams
@@ -94,8 +124,14 @@ $(document).ready(function() {
 	// load questions based on above criteria
 
 	// get questions --- based on user select of type 
-	var questionTypesSelected = [generalQuestions, geographyQuestions]
-	var gameQuestions = getQuestions(questionTypesSelected);
+	var questionTypesSelected = [generalQuestionsMultipleChoice, geographyQuestionsMultipleChoice];
+	var gameQuestions = getAllQuestions(questionTypesSelected);
+	var thisQuestion = getOneRandomQuestionAndRemoveItFromPool();
+	var thisQuestion = getOneRandomQuestionAndRemoveItFromPool();
+	var thisQuestion = getOneRandomQuestionAndRemoveItFromPool();
+
+	var thisQuestion = getOneRandomQuestionAndRemoveItFromPool();
+
 	// randomize questions
 
 	// start timer
@@ -118,20 +154,48 @@ $(document).ready(function() {
 	//console.log("so..." + generalQuestions);
 	//console.log("game questions: " + generalQuestions.gen1.question);
 
-	function getQuestions (typeOfQuestionArray) {
+	function getAllQuestions (typeOfQuestionArray) {
+		console.log("We're in get all questions:");
 		var questionObject = {};
-		for (var i = 0; i < typeOfQuestionArray.length; i++) {
-			console.log("Users selected: " + typeOfQuestionArray[i] + " so we will add these to the possible questions");
-			$.each(typeOfQuestionArray[i], function(name, character){
-				console.log("Here's the list... " + name);
-
-			});
-
-			
-		
-		}
-		console.log("this is our final result: " + questionObject)
-		//return questionArray
+		questionObject = Object.assign(generalQuestionsMultipleChoice, geographyQuestionsMultipleChoice); 
+		// TODO fix this so you can have more then 2x types - or iterate through somehow
+		console.log(questionObject);
+		console.log(generalQuestionsMultipleChoice);
+		return questionObject;
 	}
 
+	function getOneRandomQuestionAndRemoveItFromPool () {
+		console.log("We're in get one question from pool: ");
+		//var questionObjectKey; //fetch_random(gameQuestions);
+		// TODO make this random
+		var randomNumber = 0;
+
+		question = gameQuestions[Object.keys(gameQuestions)[randomNumber]].question;
+		console.log(gameQuestions[Object.keys(gameQuestions)[randomNumber]].question);
+		answer = gameQuestions[Object.keys(gameQuestions)[randomNumber]].answer;
+		console.log(gameQuestions[Object.keys(gameQuestions)[randomNumber]].answer);
+		fakeAnswer1 = gameQuestions[Object.keys(gameQuestions)[randomNumber]].fakeAnswer1;
+		console.log(gameQuestions[Object.keys(gameQuestions)[randomNumber]].fakeAnswer1);
+		fakeAnswer2 = gameQuestions[Object.keys(gameQuestions)[randomNumber]].fakeAnswer2
+		console.log(gameQuestions[Object.keys(gameQuestions)[randomNumber]].fakeAnswer2);
+		fakeAnswer3 = gameQuestions[Object.keys(gameQuestions)[randomNumber]].fakeAnswer3;
+		console.log(gameQuestions[Object.keys(gameQuestions)[randomNumber]].fakeAnswer3);
+
+		// nuke the question so it can't be asked again
+		delete gameQuestions[Object.keys(gameQuestions)[randomNumber]];
+
+	}
+
+	// function fetch_random(obj) {
+	// 	var temp_key, keys = [];
+	// 	for(temp_key in obj) {
+	// 		console.log("object: " + obj);
+	// 		console.log("temp key 1: " + temp_key);
+	// 		if(obj.hasOwnProperty(temp_key)) {
+	// 			keys.push(temp_key);
+	// 			console.log("temp_key: " + temp_key.question);
+	// 		}
+	// 	}
+	// 	return obj[keys[Math.floor(Math.random() * keys.length)]];
+	// }
 });

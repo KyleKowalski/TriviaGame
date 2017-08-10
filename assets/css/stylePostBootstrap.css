@@ -1,0 +1,56 @@
+* {
+
+}
+
+html {
+	height:100%;
+}
+
+body {
+	/*background-image: url("../images/background.jpg");*/
+	/*color:rgba(255, 255, 255, 1);*/
+}
+
+/*img {
+	float:left;
+}*/
+
+.height100 {
+	min-height:100%;
+}
+
+.relative {
+	position:relative;
+	padding:0;
+	width:100%;
+	padding:5%;
+	min-height:100%;
+} 
+
+.absolute {
+	position:absolute;
+	top:5%;
+	left:5%;
+	vertical-align: middle;
+	padding:0;
+	z-index:1;
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+	color:white;
+	width:90%;
+	height:90%;
+}
+
+.absoluteForImage {
+	position:absolute;
+	top:5%;
+	left:5%;
+	vertical-align: middle;
+	padding:0;
+	z-index:1;
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+	color:white;
+	width:90%;
+	height:90%;
+}

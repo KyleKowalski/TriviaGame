@@ -95,6 +95,7 @@ $(document).ready(function() {
 
 	var game = {
 		numberOfQuestions:3,
+		outOfQuestions:false,
 		typeOfQuestions:"all",
 		// TODO teams
 		// TODO team members
@@ -124,12 +125,14 @@ $(document).ready(function() {
 	// load questions based on above criteria
 
 	// get questions --- based on user select of type 
-	var questionTypesSelected = [generalQuestionsMultipleChoice, geographyQuestionsMultipleChoice];
+	var questionTypesSelected = [generalQuestionsMultipleChoice, 
+								geographyQuestionsMultipleChoice, 
+								generalQuestionsFillInTheBlank, 
+								geographyQuestionsFillInTheBlank];
 	var gameQuestions = getAllQuestions(questionTypesSelected);
 	var thisQuestion = getOneRandomQuestionAndRemoveItFromPool();
 	var thisQuestion = getOneRandomQuestionAndRemoveItFromPool();
 	var thisQuestion = getOneRandomQuestionAndRemoveItFromPool();
-
 	var thisQuestion = getOneRandomQuestionAndRemoveItFromPool();
 
 	// randomize questions
@@ -150,40 +153,52 @@ $(document).ready(function() {
 
 
 
-	//var gameQuestions = generalQuestions;
-	//console.log("so..." + generalQuestions);
-	//console.log("game questions: " + generalQuestions.gen1.question);
 
 	function getAllQuestions (typeOfQuestionArray) {
-		console.log("We're in get all questions:");
+		console.log("===== We're in get all questions: =====");
 		var questionObject = {};
-		questionObject = Object.assign(generalQuestionsMultipleChoice, geographyQuestionsMultipleChoice); 
-		// TODO fix this so you can have more then 2x types - or iterate through somehow
+		typeOfQuestionArray.forEach(function(item){
+			var thisItem = item;
+			console.log("adding this: ");
+			console.log(thisItem);
+			questionObject = Object.assign(questionObject, thisItem);
+		});
+		console.log("and we have this total: ")
 		console.log(questionObject);
-		console.log(generalQuestionsMultipleChoice);
 		return questionObject;
 	}
 
 	function getOneRandomQuestionAndRemoveItFromPool () {
-		console.log("We're in get one question from pool: ");
-		//var questionObjectKey; //fetch_random(gameQuestions);
-		// TODO make this random
-		var randomNumber = 0;
+		console.log("===== We're in get one question from pool: =====");
+		var numberOfQuestionsRemaining = Object.keys(gameQuestions).length;
+		console.log("Questions remaining: " + numberOfQuestionsRemaining);
+		if (numberOfQuestionsRemaining === 0) {
+			console.log("Well... we're out of cake... so your options are 'or death' --- game is over (we're out of questions).");
+			game.outOfQuestions = true;
+			return false;
+		}
 
-		question = gameQuestions[Object.keys(gameQuestions)[randomNumber]].question;
-		console.log(gameQuestions[Object.keys(gameQuestions)[randomNumber]].question);
-		answer = gameQuestions[Object.keys(gameQuestions)[randomNumber]].answer;
-		console.log(gameQuestions[Object.keys(gameQuestions)[randomNumber]].answer);
-		fakeAnswer1 = gameQuestions[Object.keys(gameQuestions)[randomNumber]].fakeAnswer1;
-		console.log(gameQuestions[Object.keys(gameQuestions)[randomNumber]].fakeAnswer1);
-		fakeAnswer2 = gameQuestions[Object.keys(gameQuestions)[randomNumber]].fakeAnswer2
-		console.log(gameQuestions[Object.keys(gameQuestions)[randomNumber]].fakeAnswer2);
-		fakeAnswer3 = gameQuestions[Object.keys(gameQuestions)[randomNumber]].fakeAnswer3;
-		console.log(gameQuestions[Object.keys(gameQuestions)[randomNumber]].fakeAnswer3);
+		var randomNumber = Math.floor(Math.random() * numberOfQuestionsRemaining);
 
+		game.round.question = gameQuestions[Object.keys(gameQuestions)[randomNumber]].question;
+		console.log(game.round.question);
+		game.round.answer = gameQuestions[Object.keys(gameQuestions)[randomNumber]].answer;
+		console.log(game.round.answer);
+		
+		// this allows us to handle both multiple guess and fill in the blank in the same function
+		if (gameQuestions[Object.keys(gameQuestions)[randomNumber]].fakeAnswer1) {
+			game.round.fakeAnswer1 = gameQuestions[Object.keys(gameQuestions)[randomNumber]].fakeAnswer1;
+			console.log(game.round.fakeAnswer1);
+			game.round.fakeAnswer2 = gameQuestions[Object.keys(gameQuestions)[randomNumber]].fakeAnswer2
+			console.log(game.round.fakeAnswer2);
+			game.round.fakeAnswer3 = gameQuestions[Object.keys(gameQuestions)[randomNumber]].fakeAnswer3;
+			console.log(game.round.fakeAnswer3);
+		}
+		else {
+			game.round.fakeAnswer1 = game.round.fakeAnswer2 = game.round.fakeAnswer3 = "";
+		}
 		// nuke the question so it can't be asked again
 		delete gameQuestions[Object.keys(gameQuestions)[randomNumber]];
-
 	}
 
 	// function fetch_random(obj) {

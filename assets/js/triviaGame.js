@@ -34,10 +34,10 @@ $(document).ready(function() {
 
 	var generalQuestionsMultipleChoice = {
 		genmc1: {
-			question:"What's my name bitch?",
-			answer:"Uhh... uhh... Kyle",
-			fakeAnswer1:"Kyle..?",
-			fakeAnswer2:"Yo daddy.",
+			question:"What's my name?",
+			answer:"Kyle",
+			fakeAnswer1:"Hey you",
+			fakeAnswer2:"The admin.",
 			fakeAnswer3:"The trivia master"
 		},
 		genmc2: {
@@ -45,21 +45,18 @@ $(document).ready(function() {
 			answer:"Green",
 			fakeAnswer1:"Yellow",
 			fakeAnswer2:"Pink",
-			fakeAnswer3:"Go choke on a pancake"
+			fakeAnswer3:"Go eat a pancake"
 		}
 	}
 
 	var generalQuestionsFillInTheBlank = {
 		genfitb1: {
-			question:"What's my name bitch?",
+			question:"What's my name?",
 			answer:"Kyle"
 		},
 		genfitb2: {
 			question:"What's my favorite color?",
-			answer:"Green",
-			fakeAnswer1:"Yellow",
-			fakeAnswer2:"Pink",
-			fakeAnswer3:"Go choke on a pancake"
+			answer:"Green"
 		}
 	}
 
@@ -106,7 +103,8 @@ $(document).ready(function() {
 			answer:"",
 			fakeAnswer1:"",
 			fakeAnswer2:"",
-			fakeAnswer3:""
+			fakeAnswer3:"",
+			correctAnswerStoredIn:""
 		}
 	}
 
@@ -126,7 +124,9 @@ $(document).ready(function() {
 
 	// get questions --- based on user select of type 
 	var questionTypesSelected = [generalQuestionsMultipleChoice, 
-								geographyQuestionsMultipleChoice, 
+								geographyQuestionsMultipleChoice
+								// ]
+								, 
 								generalQuestionsFillInTheBlank, 
 								geographyQuestionsFillInTheBlank];
 	var gameQuestions = getAllQuestions(questionTypesSelected);
@@ -201,16 +201,18 @@ $(document).ready(function() {
 		delete gameQuestions[Object.keys(gameQuestions)[randomNumber]];
 	}
 
-	// function fetch_random(obj) {
-	// 	var temp_key, keys = [];
-	// 	for(temp_key in obj) {
-	// 		console.log("object: " + obj);
-	// 		console.log("temp key 1: " + temp_key);
-	// 		if(obj.hasOwnProperty(temp_key)) {
-	// 			keys.push(temp_key);
-	// 			console.log("temp_key: " + temp_key.question);
-	// 		}
-	// 	}
-	// 	return obj[keys[Math.floor(Math.random() * keys.length)]];
-	// }
+	function writeQuestionAndAnswerToScreen () {
+		// first we clean up
+		$("#question").empty();
+		$("#answer1").empty();
+		$("#answer2").empty();
+		$("#answer3").empty();
+		$("#answer4").empty();
+
+		// need to randomize the answers:
+
+		// correct answer written to:  
+		game.round.correctAnswerStoredIn = ""
+	}
+
 });

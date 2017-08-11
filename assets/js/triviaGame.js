@@ -91,12 +91,12 @@ $(document).ready(function() {
 		// time after answer (make this variable? ... why not? --- zero is infinite, otherwise use # of seconds)
 
 	var game = {
-		numberOfQuestions:3,
+		numberOfQuestions:5,
 		outOfQuestions:false,
 		typeOfQuestions:"all",
 		// TODO teams
 		// TODO team members
-		allowFillInTheBlank:false,
+		allowFillInTheBlank:true,
 		timer:30, // assume seconds - 0 is 'infinite', otherwise just seconds
 		round: {
 			question:"",
@@ -125,15 +125,15 @@ $(document).ready(function() {
 	// get questions --- based on user select of type 
 	var questionTypesSelected = [generalQuestionsMultipleChoice, 
 								geographyQuestionsMultipleChoice
-								// ]
+								// ];
 								, 
 								generalQuestionsFillInTheBlank, 
 								geographyQuestionsFillInTheBlank];
 	var gameQuestions = getAllQuestions(questionTypesSelected);
-	var thisQuestion = getOneRandomQuestionAndRemoveItFromPool();
-	var thisQuestion = getOneRandomQuestionAndRemoveItFromPool();
-	var thisQuestion = getOneRandomQuestionAndRemoveItFromPool();
-	var thisQuestion = getOneRandomQuestionAndRemoveItFromPool();
+	getOneRandomQuestionAndRemoveItFromPool();
+	getOneRandomQuestionAndRemoveItFromPool();
+	getOneRandomQuestionAndRemoveItFromPool();
+	getOneRandomQuestionAndRemoveItFromPool();
 
 	// randomize questions
 
@@ -154,7 +154,7 @@ $(document).ready(function() {
 
 
 
-	function getAllQuestions (typeOfQuestionArray) {
+	function getAllQuestions(typeOfQuestionArray) {
 		console.log("===== We're in get all questions: =====");
 		var questionObject = {};
 		typeOfQuestionArray.forEach(function(item){
@@ -168,10 +168,15 @@ $(document).ready(function() {
 		return questionObject;
 	}
 
-	function getOneRandomQuestionAndRemoveItFromPool () {
+	function getOneRandomQuestionAndRemoveItFromPool() {
 		console.log("===== We're in get one question from pool: =====");
-		var numberOfQuestionsRemaining = Object.keys(gameQuestions).length;
-		console.log("Questions remaining: " + numberOfQuestionsRemaining);
+		var numberOfQuestionsRemaining = getNumberOfQuestionsRemaining();
+
+		console.log("Questions remaining in game: " + game.numberOfQuestions + " questions remaining to be asked: " + numberOfQuestionsRemaining);
+		if (numberOfQuestionsRemaining < game.numberOfQuestions) {
+			// TODO need to handle this more gracefully
+			console.log("***** WARNING ***** not enough questions to finish the game");
+		}
 		if (numberOfQuestionsRemaining === 0) {
 			console.log("Well... we're out of cake... so your options are 'or death' --- game is over (we're out of questions).");
 			game.outOfQuestions = true;
@@ -181,27 +186,29 @@ $(document).ready(function() {
 		var randomNumber = Math.floor(Math.random() * numberOfQuestionsRemaining);
 
 		game.round.question = gameQuestions[Object.keys(gameQuestions)[randomNumber]].question;
-		console.log(game.round.question);
+		console.log("question: " + game.round.question);
 		game.round.answer = gameQuestions[Object.keys(gameQuestions)[randomNumber]].answer;
-		console.log(game.round.answer);
+		console.log("correct answer: " + game.round.answer);
 		
+		// TODO redo this with another key in the object that defines multiple choice and fill in the blank - then iterate through what is left (gives no longer fixed length answers)
 		// this allows us to handle both multiple guess and fill in the blank in the same function
 		if (gameQuestions[Object.keys(gameQuestions)[randomNumber]].fakeAnswer1) {
 			game.round.fakeAnswer1 = gameQuestions[Object.keys(gameQuestions)[randomNumber]].fakeAnswer1;
-			console.log(game.round.fakeAnswer1);
+			console.log("fake answer1: " + game.round.fakeAnswer1);
 			game.round.fakeAnswer2 = gameQuestions[Object.keys(gameQuestions)[randomNumber]].fakeAnswer2
-			console.log(game.round.fakeAnswer2);
+			console.log("fake answer2: " + game.round.fakeAnswer2);
 			game.round.fakeAnswer3 = gameQuestions[Object.keys(gameQuestions)[randomNumber]].fakeAnswer3;
-			console.log(game.round.fakeAnswer3);
+			console.log("fake answer3: " + game.round.fakeAnswer3);
 		}
 		else {
 			game.round.fakeAnswer1 = game.round.fakeAnswer2 = game.round.fakeAnswer3 = "";
 		}
-		// nuke the question so it can't be asked again
+		// nuke the question so it can't be asked again until we reload the questions - decriment number of questions in game
 		delete gameQuestions[Object.keys(gameQuestions)[randomNumber]];
+		game.numberOfQuestions--;
 	}
 
-	function writeQuestionAndAnswerToScreen () {
+	function writeQuestionAndAnswerToScreen() {
 		// first we clean up
 		$("#question").empty();
 		$("#answer1").empty();
@@ -209,10 +216,19 @@ $(document).ready(function() {
 		$("#answer3").empty();
 		$("#answer4").empty();
 
+		$("#question").html(game.round.question);
 		// need to randomize the answers:
+
+
+
 
 		// correct answer written to:  
 		game.round.correctAnswerStoredIn = ""
 	}
 
+	function getNumberOfQuestionsRemaining() {
+		var numberOfQuestionsRemaining = Object.keys(gameQuestions).length;
+		console.log("Number of questions remaining: " + numberOfQuestionsRemaining);
+		return numberOfQuestionsRemaining;
+	}
 });

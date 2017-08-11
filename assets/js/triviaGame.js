@@ -206,6 +206,8 @@ $(document).ready(function() {
 		}
 
 		var randomNumber = Math.floor(Math.random() * numberOfQuestionsRemaining);
+		// TODO use this to randomize the answers
+		createRandomNumberArray(4); // TODO don't hard code this.
 
 		game.round.question = gameQuestions[Object.keys(gameQuestions)[randomNumber]].question;
 		console.log("question: " + game.round.question);
@@ -252,7 +254,6 @@ $(document).ready(function() {
 		$("#answer4").empty();
 
 		$("#question").html(game.round.question);
-		// need to randomize the answers:
 
 
 
@@ -266,4 +267,35 @@ $(document).ready(function() {
 		console.log("Number of questions remaining: " + numberOfQuestionsRemaining);
 		return numberOfQuestionsRemaining;
 	}
+
+	function createRandomNumberArray(number) {
+		var returnArray = [];
+		for (var i = 1; i <= number; i++){
+			console.log("numbers to array: " + i)
+			returnArray.push(i);
+		}
+		console.log("Unsorted array: " + returnArray);
+		shuffle(returnArray);
+		console.log("Sorted 'shuffled' array: " + returnArray);
+		return returnArray;
+	}
+
+	function shuffle(array) { // shamelessly copied from: https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
+  		var currentIndex = array.length, temporaryValue, randomIndex;
+
+  		// While there remain elements to shuffle...
+  		while (0 !== currentIndex) {
+
+	    // Pick a remaining element...
+	    randomIndex = Math.floor(Math.random() * currentIndex);
+	    currentIndex -= 1;
+
+	    // And swap it with the current element.
+	    temporaryValue = array[currentIndex];
+	    array[currentIndex] = array[randomIndex];
+	    array[randomIndex] = temporaryValue;
+	}
+
+  return array;
+}
 });

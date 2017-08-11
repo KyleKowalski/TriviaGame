@@ -36,6 +36,7 @@ $(document).ready(function() {
 		genmc1: {
 			question:"What's my name?",
 			answer:"Kyle",
+			type:"mc",
 			fakeAnswer1:"Hey you",
 			fakeAnswer2:"The admin.",
 			fakeAnswer3:"The trivia master"
@@ -43,6 +44,7 @@ $(document).ready(function() {
 		genmc2: {
 			question:"What's my favorite color?",
 			answer:"Green",
+			type:"mc",
 			fakeAnswer1:"Yellow",
 			fakeAnswer2:"Pink",
 			fakeAnswer3:"Go eat a pancake"
@@ -52,11 +54,20 @@ $(document).ready(function() {
 	var generalQuestionsFillInTheBlank = {
 		genfitb1: {
 			question:"What's my name?",
-			answer:"Kyle"
+			answer:"Kyle",
+			type:"fitb"
 		},
 		genfitb2: {
 			question:"What's my favorite color?",
-			answer:"Green"
+			answer:"Green",
+			type:"fitb"
+		},
+		genfitb3: {
+			question:"Name 3 presidents?",
+			type:"fitb",
+			answer:"needs human review",
+			answer2:"needs human review",
+			answer3:"needs human review"
 		}
 	}
 
@@ -64,6 +75,7 @@ $(document).ready(function() {
 		geomc1: {
 			question:"Where is Colorado?",
 			answer:"In the middle of the United States",
+			type:"mc",
 			fakeAnswer1:"It's a figment of your imagination",
 			fakeAnswer2:"Where we all are",
 			fakeAnswer3:"Everywhere."
@@ -73,7 +85,8 @@ $(document).ready(function() {
 	var geographyQuestionsFillInTheBlank = {
 		geofitb1: {
 			question:"Spell Colorado?",
-			answer:"Colorado"
+			answer:"Colorado",
+			type:"fitb"
 		}
 	}
 
@@ -101,10 +114,14 @@ $(document).ready(function() {
 		round: {
 			question:"",
 			answer:"",
+			type:"",
 			fakeAnswer1:"",
 			fakeAnswer2:"",
 			fakeAnswer3:"",
-			correctAnswerStoredIn:""
+			correctAnswerStoredIn:"",
+			fillInTheBlank1:"",
+			fillInTheBlank2:"",
+			fillInTheBlank3:""
 		}
 	}
 
@@ -130,10 +147,15 @@ $(document).ready(function() {
 								generalQuestionsFillInTheBlank, 
 								geographyQuestionsFillInTheBlank];
 	var gameQuestions = getAllQuestions(questionTypesSelected);
+	
+	// TODO this will be in some kind of loop
 	getOneRandomQuestionAndRemoveItFromPool();
-	getOneRandomQuestionAndRemoveItFromPool();
-	getOneRandomQuestionAndRemoveItFromPool();
-	getOneRandomQuestionAndRemoveItFromPool();
+	writeQuestionAndAnswerToScreen();
+	
+
+	// getOneRandomQuestionAndRemoveItFromPool();
+	// getOneRandomQuestionAndRemoveItFromPool();
+	// getOneRandomQuestionAndRemoveItFromPool();
 
 	// randomize questions
 
@@ -189,19 +211,32 @@ $(document).ready(function() {
 		console.log("question: " + game.round.question);
 		game.round.answer = gameQuestions[Object.keys(gameQuestions)[randomNumber]].answer;
 		console.log("correct answer: " + game.round.answer);
-		
+		$("#mcAnswer1").html(game.round.answer);
 		// TODO redo this with another key in the object that defines multiple choice and fill in the blank - then iterate through what is left (gives no longer fixed length answers)
 		// this allows us to handle both multiple guess and fill in the blank in the same function
-		if (gameQuestions[Object.keys(gameQuestions)[randomNumber]].fakeAnswer1) {
+		if (gameQuestions[Object.keys(gameQuestions)[randomNumber]].type == "mc") {
+			console.log("looks like a multple choice question - we need fake answers");
+
+			// if (gameQuestions[Object.keys(gameQuestions)[randomNumber]].fakeAnswer1) {
 			game.round.fakeAnswer1 = gameQuestions[Object.keys(gameQuestions)[randomNumber]].fakeAnswer1;
 			console.log("fake answer1: " + game.round.fakeAnswer1);
+			$("#mcAnswer2").html(game.round.fakeAnswer1);
 			game.round.fakeAnswer2 = gameQuestions[Object.keys(gameQuestions)[randomNumber]].fakeAnswer2
 			console.log("fake answer2: " + game.round.fakeAnswer2);
+			$("#mcAnswer3").html(game.round.fakeAnswer2);
 			game.round.fakeAnswer3 = gameQuestions[Object.keys(gameQuestions)[randomNumber]].fakeAnswer3;
 			console.log("fake answer3: " + game.round.fakeAnswer3);
+			$("#mcAnswer4").html(game.round.fakeAnswer3);
+
+			$(".fitb").addClass("hidden");
+			$(".mc").removeClass("hidden");
+
 		}
-		else {
-			game.round.fakeAnswer1 = game.round.fakeAnswer2 = game.round.fakeAnswer3 = "";
+		else if (gameQuestions[Object.keys(gameQuestions)[randomNumber]].type == "fitb") {
+			console.log("looks like a fill in the blank, we need to add blanks")
+			// TODO cycle through here and add in secondary and tertiary options when needed - loop for N answers
+			$(".fitb").removeClass("hidden");
+			$(".mc").addClass("hidden");
 		}
 		// nuke the question so it can't be asked again until we reload the questions - decriment number of questions in game
 		delete gameQuestions[Object.keys(gameQuestions)[randomNumber]];

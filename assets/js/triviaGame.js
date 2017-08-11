@@ -142,10 +142,10 @@ $(document).ready(function() {
 	// get questions --- based on user select of type 
 	var questionTypesSelected = [generalQuestionsMultipleChoice, 
 								geographyQuestionsMultipleChoice
-								// ];
-								, 
-								generalQuestionsFillInTheBlank, 
-								geographyQuestionsFillInTheBlank];
+								];
+								// , 
+								// generalQuestionsFillInTheBlank, 
+								// geographyQuestionsFillInTheBlank];
 	var gameQuestions = getAllQuestions(questionTypesSelected);
 	
 	// TODO this will be in some kind of loop
@@ -207,14 +207,14 @@ $(document).ready(function() {
 
 		var randomNumber = Math.floor(Math.random() * numberOfQuestionsRemaining);
 		// TODO use this to randomize the answers
-		createRandomNumberArray(4); // TODO don't hard code this.
+		var randomNumberArray = createAndShuffleRandomNumberArray(4); // TODO this should be the length of the answers, not hard coded
 
 		game.round.question = gameQuestions[Object.keys(gameQuestions)[randomNumber]].question;
 		console.log("question: " + game.round.question);
 		game.round.answer = gameQuestions[Object.keys(gameQuestions)[randomNumber]].answer;
 		console.log("correct answer: " + game.round.answer);
-		$("#mcAnswer1").html(game.round.answer);
-		// TODO redo this with another key in the object that defines multiple choice and fill in the blank - then iterate through what is left (gives no longer fixed length answers)
+		$("#mcAnswer" + randomNumberArray[0]).html(game.round.answer);
+		// TODO redo this where it auto finds the length of the new answers - not just a single one
 		// this allows us to handle both multiple guess and fill in the blank in the same function
 		if (gameQuestions[Object.keys(gameQuestions)[randomNumber]].type == "mc") {
 			console.log("looks like a multple choice question - we need fake answers");
@@ -222,13 +222,15 @@ $(document).ready(function() {
 			// if (gameQuestions[Object.keys(gameQuestions)[randomNumber]].fakeAnswer1) {
 			game.round.fakeAnswer1 = gameQuestions[Object.keys(gameQuestions)[randomNumber]].fakeAnswer1;
 			console.log("fake answer1: " + game.round.fakeAnswer1);
-			$("#mcAnswer2").html(game.round.fakeAnswer1);
+			var thisTarget = "#mcAnswer" + randomNumberArray[1];
+			console.log("so... >" + thisTarget + "<");
+			$(thisTarget).html(game.round.fakeAnswer1);
 			game.round.fakeAnswer2 = gameQuestions[Object.keys(gameQuestions)[randomNumber]].fakeAnswer2
 			console.log("fake answer2: " + game.round.fakeAnswer2);
-			$("#mcAnswer3").html(game.round.fakeAnswer2);
+			$("#mcAnswer" + randomNumberArray[2]).html(game.round.fakeAnswer2);
 			game.round.fakeAnswer3 = gameQuestions[Object.keys(gameQuestions)[randomNumber]].fakeAnswer3;
 			console.log("fake answer3: " + game.round.fakeAnswer3);
-			$("#mcAnswer4").html(game.round.fakeAnswer3);
+			$("#mcAnswer" + randomNumberAray[3]).html(game.round.fakeAnswer3);
 
 			$(".fitb").addClass("hidden");
 			$(".mc").removeClass("hidden");
@@ -268,7 +270,7 @@ $(document).ready(function() {
 		return numberOfQuestionsRemaining;
 	}
 
-	function createRandomNumberArray(number) {
+	function createAndShuffleRandomNumberArray(number) {
 		var returnArray = [];
 		for (var i = 1; i <= number; i++){
 			console.log("numbers to array: " + i)

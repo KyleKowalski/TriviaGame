@@ -212,6 +212,11 @@ $(document).ready(function() {
 		game.round.question = gameQuestions[Object.keys(gameQuestions)[randomNumber]].question;
 		console.log("question: " + game.round.question);
 		game.round.answer = gameQuestions[Object.keys(gameQuestions)[randomNumber]].answer;
+		game.round.correctAnswerStoredIn = "#mcAnswer" + randomNumberArray[0];
+
+		// TODO REMOVE THE FOLLOWING LINE - this is just for testing
+		$("#mcAnswer" + randomNumberArray[0]).addClass("bg-success text-white");
+		// TODO REMOVE THE ABOVE LINE - this is just for testing
 		console.log("correct answer: " + game.round.answer);
 		$("#mcAnswer" + randomNumberArray[0]).html(game.round.answer);
 		// TODO redo this where it auto finds the length of the new answers - not just a single one
@@ -222,15 +227,13 @@ $(document).ready(function() {
 			// if (gameQuestions[Object.keys(gameQuestions)[randomNumber]].fakeAnswer1) {
 			game.round.fakeAnswer1 = gameQuestions[Object.keys(gameQuestions)[randomNumber]].fakeAnswer1;
 			console.log("fake answer1: " + game.round.fakeAnswer1);
-			var thisTarget = "#mcAnswer" + randomNumberArray[1];
-			console.log("so... >" + thisTarget + "<");
-			$(thisTarget).html(game.round.fakeAnswer1);
+			$("#mcAnswer" + randomNumberArray[1]).html(game.round.fakeAnswer1);
 			game.round.fakeAnswer2 = gameQuestions[Object.keys(gameQuestions)[randomNumber]].fakeAnswer2
 			console.log("fake answer2: " + game.round.fakeAnswer2);
 			$("#mcAnswer" + randomNumberArray[2]).html(game.round.fakeAnswer2);
 			game.round.fakeAnswer3 = gameQuestions[Object.keys(gameQuestions)[randomNumber]].fakeAnswer3;
 			console.log("fake answer3: " + game.round.fakeAnswer3);
-			$("#mcAnswer" + randomNumberAray[3]).html(game.round.fakeAnswer3);
+			$("#mcAnswer" + randomNumberArray[3]).html(game.round.fakeAnswer3);
 
 			$(".fitb").addClass("hidden");
 			$(".mc").removeClass("hidden");

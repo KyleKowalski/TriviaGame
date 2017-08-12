@@ -55,19 +55,20 @@ $(document).ready(function() {
 		genfitb1: {
 			question:"What's my name?",
 			answer:"Kyle",
+			showBlanks:1,
 			type:"fitb"
 		},
 		genfitb2: {
 			question:"What's my favorite color?",
 			answer:"Green",
+			showBlanks:1,
 			type:"fitb"
 		},
 		genfitb3: {
 			question:"Name 3 presidents?",
-			type:"fitb",
 			answer:"needs human review",
-			answer2:"needs human review",
-			answer3:"needs human review"
+			showBlanks:3,
+			type:"fitb"
 		}
 	}
 
@@ -86,6 +87,13 @@ $(document).ready(function() {
 		geofitb1: {
 			question:"Spell Colorado?",
 			answer:"Colorado",
+			showBlanks:1,
+			type:"fitb"
+		},
+		geofitb1: {
+			question:"Name States that start with C?",
+			answer:"Colorado, Connecticut, California",
+			showBlanks:3,
 			type:"fitb"
 		}
 	}
@@ -119,9 +127,9 @@ $(document).ready(function() {
 			fakeAnswer2:"",
 			fakeAnswer3:"",
 			correctAnswerStoredIn:"",
-			fillInTheBlank1:"",
-			fillInTheBlank2:"",
-			fillInTheBlank3:""
+			showBlanks:"",
+			needsToBeGraded:"",
+			answerToBeGraded:""  // separate by...?  something?  
 		}
 	}
 
@@ -142,10 +150,10 @@ $(document).ready(function() {
 	// get questions --- based on user select of type 
 	var questionTypesSelected = [generalQuestionsMultipleChoice, 
 								geographyQuestionsMultipleChoice
-								];
-								// , 
-								// generalQuestionsFillInTheBlank, 
-								// geographyQuestionsFillInTheBlank];
+								// ];
+								, 
+								generalQuestionsFillInTheBlank, 
+								geographyQuestionsFillInTheBlank];
 	var gameQuestions = getAllQuestions(questionTypesSelected);
 	
 	// TODO this will be in some kind of loop
@@ -192,6 +200,19 @@ $(document).ready(function() {
 
 	function getOneRandomQuestionAndRemoveItFromPool() {
 		console.log("===== We're in get one question from pool: =====");
+
+		if (game.round.needsToBeGraded = true) {
+			console.log("Yikes!  We should grade their answer before getting our own question!");
+			// TODO Add grading stuff here
+			if (game.round.answerToBeGraded !== "") {
+				alert("previous question needs to be graded... question: " + game.round.question + " answer:" + game.round.answerToBeGraded);
+				// TODO more stuff here.
+				
+			}
+			game.round.needsToBeGraded = false; // and we're done grading so we clear that out
+		}
+
+
 		var numberOfQuestionsRemaining = getNumberOfQuestionsRemaining();
 
 		console.log("Questions remaining in game: " + game.numberOfQuestions + " questions remaining to be asked: " + numberOfQuestionsRemaining);
@@ -215,7 +236,7 @@ $(document).ready(function() {
 		game.round.correctAnswerStoredIn = "#mcAnswer" + randomNumberArray[0];
 
 		// TODO REMOVE THE FOLLOWING LINE - this is just for testing
-		$("#mcAnswer" + randomNumberArray[0]).addClass("bg-success text-white");
+		$("#mcAnswer" + randomNumberArray[0]).addClass("bg-success");
 		// TODO REMOVE THE ABOVE LINE - this is just for testing
 		console.log("correct answer: " + game.round.answer);
 		$("#mcAnswer" + randomNumberArray[0]).html(game.round.answer);
@@ -241,9 +262,30 @@ $(document).ready(function() {
 		}
 		else if (gameQuestions[Object.keys(gameQuestions)[randomNumber]].type == "fitb") {
 			console.log("looks like a fill in the blank, we need to add blanks")
+			game.round.showBlanks = gameQuestions[Object.keys(gameQuestions)[randomNumber]].showBlanks;
 			// TODO cycle through here and add in secondary and tertiary options when needed - loop for N answers
-			$(".fitb").removeClass("hidden");
+			var targetParent = $(".fitb")
+			targetParent.empty();
+			targetParent.removeClass("hidden");
 			$(".mc").addClass("hidden");
+
+			for (var i = 1; i <= game.round.showBlanks; i++) {
+				console.log("show: " + i);
+				var newRow = document.createElement("row");
+				var newDiv = document.createElement("div");
+				var newInput = document.createElement("input");
+				newInput.type = "text";
+				newInput.id = "answer" + i;
+				targetParent.append(newRow);
+				newRow.append(newDiv);
+				newDiv.append(newInput);
+				newInput.setAttribute("class", "form-control");
+
+			}
+			// TODO add a submit button here
+
+			game.round.needsToBeGraded = true;
+
 		}
 		// nuke the question so it can't be asked again until we reload the questions - decriment number of questions in game
 		delete gameQuestions[Object.keys(gameQuestions)[randomNumber]];
@@ -281,7 +323,7 @@ $(document).ready(function() {
 		}
 		console.log("Unsorted array: " + returnArray);
 		shuffle(returnArray);
-		console.log("Sorted 'shuffled' array: " + returnArray);
+		console.log("Shuffled array: " + returnArray);
 		return returnArray;
 	}
 

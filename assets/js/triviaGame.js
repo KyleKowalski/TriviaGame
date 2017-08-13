@@ -117,39 +117,40 @@ $(document).ready(function() {
 		// time to answer (make this variable? ... why not? --- zero is infinite, otherwise use # of seconds)
 		// time after answer (make this variable? ... why not? --- zero is infinite, otherwise use # of seconds)
 
-	var game = {
-		numberOfQuestions:5,
-		outOfQuestions:false,
-		typeOfQuestions:"all",
-		// TODO teams
-		// TODO team members
-		allowFillInTheBlank:true,
-		timer:30, // assume seconds - 0 is 'infinite', otherwise just seconds
-		round: {
-			question:"",
-			answer:"",
-			type:"",
-			fakeAnswer1:"",
-			fakeAnswer2:"",
-			fakeAnswer3:"",
-			correctAnswerStoredIn:"",
-			showBlanks:"",
-			needsToBeGraded:"",
-			answerToBeGraded:""  // separate by...?  something?  
-		},
-		team1: { // TODO dynamically create me
-			members:"",
-			correctAnswers:0,
-			incorrectAnswers:0,
-			needTieBreaker:false
-		},
-		team2: {// TODO dynamically create me 
-			members:"",
-			correctAnswers:0,
-			incorrectAnswers:0,
-			needTieBreaker:false
-		}
-	}
+	var game = {};
+	var gameQuestions = {};
+		// 	numberOfQuestions:5,
+	// 	outOfQuestions:false,
+	// 	typeOfQuestions:"all",
+	// 	// TODO teams
+	// 	// TODO team members
+	// 	allowFillInTheBlank:true,
+	// 	timer:30, // assume seconds - 0 is 'infinite', otherwise just seconds
+	// 	round: {
+	// 		question:"",
+	// 		answer:"",
+	// 		type:"",
+	// 		fakeAnswer1:"",
+	// 		fakeAnswer2:"",
+	// 		fakeAnswer3:"",
+	// 		correctAnswerStoredIn:"",
+	// 		showBlanks:"",
+	// 		needsToBeGraded:"",
+	// 		answerToBeGraded:""  // separate by...?  something?  
+	// 	},
+	// 	team1: { // TODO dynamically create me
+	// 		members:"",
+	// 		correctAnswers:0,
+	// 		incorrectAnswers:0,
+	// 		needTieBreaker:false
+	// 	},
+	// 	team2: {// TODO dynamically create me 
+	// 		members:"",
+	// 		correctAnswers:0,
+	// 		incorrectAnswers:0,
+	// 		needTieBreaker:false
+	// 	}
+	// }
 
 
 
@@ -167,18 +168,20 @@ $(document).ready(function() {
 	// load questions based on above criteria
 
 	// get questions --- based on user select of type 
-	var questionTypesSelected = [generalQuestionsMultipleChoice, 
-								geographyQuestionsMultipleChoice
-								// ];
-								, 
-								generalQuestionsFillInTheBlank, 
-								geographyQuestionsFillInTheBlank];
-	var gameQuestions = getAllQuestions(questionTypesSelected);
+	// var questionTypesSelected = [generalQuestionsMultipleChoice, 
+	// 							geographyQuestionsMultipleChoice
+	// 							// ];
+	// 							, 
+	// 							generalQuestionsFillInTheBlank, 
+	// 							geographyQuestionsFillInTheBlank];
+	// var gameQuestions = getAllQuestions(questionTypesSelected);
 	
-	// TODO this will be in some kind of loop
-	getOneRandomQuestionAndRemoveItFromPool();
-	cleanUpForNextQuestion();
 	
+	// // TODO this will be in some kind of loop
+	
+	// getOneRandomQuestionAndRemoveItFromPool();
+	
+	beginGame();
 
 	// randomize questions - DONE
 
@@ -196,8 +199,69 @@ $(document).ready(function() {
 
 	// TODO remove question from list when already answered - so next game has new questions - DONE
 
+	function setupGame() {
+		game = {
+			numberOfQuestions:5,
+			outOfQuestions:false,
+			typeOfQuestions:"all",
+			allowFillInTheBlank:true,
+			timer:30, // TODO assume seconds - 0 is 'infinite', otherwise just seconds
+			round: {
+				question:"",
+				answer:"",
+				type:"",
+				fakeAnswer1:"",
+				fakeAnswer2:"",
+				fakeAnswer3:"",
+				correctAnswerStoredIn:"",
+				showBlanks:"",
+				needsToBeGraded:false,
+				answerToBeGraded:""
+			},
+			team1: { // TODO dynamically create me
+				members:"", // TODO add
+				correctAnswers:0, // TODO add
+				incorrectAnswers:0, // TODO add
+				needTieBreaker:false // TODO add
+			},
+			team2: {// TODO dynamically create me 
+				members:"", // TODO add
+				correctAnswers:0, // TODO add
+				incorrectAnswers:0, // TODO add
+				needTieBreaker:false // TODO add
+			}
+		}	
 
+		// TODO establish teams (screens and prompts)
 
+		// TODO select question types dynamically
+
+		// TODO select number of questions, timer, etc
+
+		var questionTypesSelected = [generalQuestionsMultipleChoice, 
+								geographyQuestionsMultipleChoice
+								// ];
+								, 
+								generalQuestionsFillInTheBlank, 
+								geographyQuestionsFillInTheBlank];
+		gameQuestions = getAllQuestions(questionTypesSelected);
+			
+	
+	}
+
+	function beginGame() {
+		setupGame();
+
+		console.log("This will be a " + game.numberOfQuestions + " question long game.")
+		
+		getOneRandomQuestionAndRemoveItFromPool();
+
+		// for (var i = 0; i < game.numberOfQuestions; i++) {
+			
+
+		// }
+
+	}
 
 	function getAllQuestions(typeOfQuestionArray) {
 		console.log("===== We're in get all questions: =====");
@@ -208,7 +272,7 @@ $(document).ready(function() {
 			console.log(thisItem);
 			questionObject = Object.assign(questionObject, thisItem);
 		});
-		console.log("and we have this total: ")
+		console.log("and we have this total: ");
 		console.log(questionObject);
 		return questionObject;
 	}
@@ -231,7 +295,8 @@ $(document).ready(function() {
 			}
 			game.round.needsToBeGraded = false; // and we're done grading so we clear that out
 		}
-
+		console.log("finished grading, on to next question");
+		cleanUpForNextQuestion();
 
 		var numberOfQuestionsRemaining = getNumberOfQuestionsRemaining();
 
@@ -248,11 +313,11 @@ $(document).ready(function() {
 		}
 
 		var randomNumber = Math.floor(Math.random() * numberOfQuestionsRemaining);
-		// TODO use this to randomize the answers
 		var randomNumberArray = createAndShuffleRandomNumberArray(4); // TODO this should be the length of the answers, not hard coded
 
 		game.round.question = gameQuestions[Object.keys(gameQuestions)[randomNumber]].question;
 		console.log("question: " + game.round.question);
+		$("#question").html("<h1>" + game.round.question + "</h1>");
 		game.round.answer = gameQuestions[Object.keys(gameQuestions)[randomNumber]].answer;
 		game.round.correctAnswerStoredIn = "#mcAnswer" + randomNumberArray[0];
 
@@ -304,12 +369,8 @@ $(document).ready(function() {
 				newInput.setAttribute("class", "form-control");
 
 			}
-			// TODO add a submit button here
-			// var newSubmit = document.createElement("input");
-			// newSubmit.type = "submit";
-			// newSubmit.value = "Submit";
-			// targetParent.append(newSubmit);
 			game.round.needsToBeGraded = true;
+			game.round.answerToBeGraded = "";
 
 		}
 		else {
@@ -323,11 +384,8 @@ $(document).ready(function() {
 	function cleanUpForNextQuestion() {
 		// first we clean up
 		$("#question").empty();
-		$("#answer1").empty();
-		$("#answer2").empty();
-		$("#answer3").empty();
-		$("#answer4").empty();
-
+		game.round.needsToBeGraded = true;
+		game.round.answerToBeGraded = "";
 		game.round.correctAnswerStoredIn = "";
 
 		// TODO more here
@@ -369,27 +427,20 @@ $(document).ready(function() {
   	return array;
 	}
 
-	function submitAnswersForFillInTheBlank() {
-		var returnString;
-		console.log("received request to submit answer from page")
-
-		// for (var i = 0; i < game.round.showBlanks; i++) {
-		// 	console.log("getting value from page: " + $("#answer1").val());
-		// }
-	}
-
 	function processForm(e) { // nabbed from: https://stackoverflow.com/questions/5384712/capture-a-form-submit-in-javascript
     if (e.preventDefault) e.preventDefault();
 
     console.log("here we are submitting the form");
     	for (var i = 1; i <= game.round.showBlanks; i++) {
 			console.log("getting value " + i + " from page: " + $("#answer" + i).val());
-			game.round.correctAnswerStoredIn += $("#answer" + i).val();
+			game.round.answerToBeGraded += $("#answer" + i).val();
 			if (game.round.showBlanks > 1 && i != game.round.showBlanks) {
-				game.round.correctAnswerStoredIn += ", ";
+				game.round.answerToBeGraded += ", ";
 			}
 		}
-		console.log("final answer: " + game.round.correctAnswerStoredIn);
+		console.log("final answer: " + game.round.answerToBeGraded);
+
+		// TODO on submit change to next question.  
 
     return false;
 	}

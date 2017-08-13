@@ -69,6 +69,12 @@ $(document).ready(function() {
 			answer:"needs human review",
 			showBlanks:3,
 			type:"fitb"
+		},
+		genfitb4: {
+			question:"Name 5 presidents since 1980?",
+			answer:"(5 of these) Regan, Bush Jr, Bush Sr, Clinton, Obama, & Trump",
+			showBlanks:5,
+			type:"fitb"
 		}
 	}
 
@@ -103,11 +109,11 @@ $(document).ready(function() {
 	// basic setup
 		// how many questions
 			// type of questions?
-				// multiple choice
-				// fill in the blank  TODO:  this is out of scope
+				// multiple choice - DONE
+				// fill in the blank  TODO:  this is out of scope - DONE
 					// take everything to lower case to make this easier. string comparison?
-					// fuzzy string matching?  This would be HARD to do.
-		// genre(s)?
+					// fuzzy string matching?  This would be HARD to do. - SKIP (for now - likely outside of scope)
+		// genre(s)? - DONE - handled in question setup
 		// time to answer (make this variable? ... why not? --- zero is infinite, otherwise use # of seconds)
 		// time after answer (make this variable? ... why not? --- zero is infinite, otherwise use # of seconds)
 
@@ -130,6 +136,18 @@ $(document).ready(function() {
 			showBlanks:"",
 			needsToBeGraded:"",
 			answerToBeGraded:""  // separate by...?  something?  
+		},
+		team1: { // TODO dynamically create me
+			members:"",
+			correctAnswers:0,
+			incorrectAnswers:0,
+			needTieBreaker:false
+		},
+		team2: {// TODO dynamically create me 
+			members:"",
+			correctAnswers:0,
+			incorrectAnswers:0,
+			needTieBreaker:false
 		}
 	}
 
@@ -137,10 +155,11 @@ $(document).ready(function() {
 
 	// TODO:  Advanced setup:  
 		// Setup Teams
-		// Option to answer again and again if correct
-		// Option to only get one question before rotating
+		// Option to answer again and again if correct - PASS
+		// Option to only get one question before rotating - GOING WITH THIS METHOD (other is boring for other teams)
 
 	// TODO:  Pause button (longer games will need it - throw up a splash screen so that the game is not visible?)
+		// limit to 3x pauses or what not?
 
 
 	
@@ -158,20 +177,16 @@ $(document).ready(function() {
 	
 	// TODO this will be in some kind of loop
 	getOneRandomQuestionAndRemoveItFromPool();
-	writeQuestionAndAnswerToScreen();
+	cleanUpForNextQuestion();
 	
 
-	// getOneRandomQuestionAndRemoveItFromPool();
-	// getOneRandomQuestionAndRemoveItFromPool();
-	// getOneRandomQuestionAndRemoveItFromPool();
-
-	// randomize questions
+	// randomize questions - DONE
 
 	// start timer
 
-	// show question
+	// show question - DONE
 
-	// dynamically build answers
+	// dynamically build answers - DONE
 
 	// on click user answers or timeout
 
@@ -179,7 +194,7 @@ $(document).ready(function() {
 
 	// load next question
 
-	// TODO remove question from list when already answered - so next game has new questions
+	// TODO remove question from list when already answered - so next game has new questions - DONE
 
 
 
@@ -206,8 +221,13 @@ $(document).ready(function() {
 			// TODO Add grading stuff here
 			if (game.round.answerToBeGraded !== "") {
 				alert("previous question needs to be graded... question: " + game.round.question + " answer:" + game.round.answerToBeGraded);
+				if (game.round.answer.toLowerCase() == game.round.answerToBeGraded.toLowerCase()) {
+					console.log("*****AMAZING!!!!  The answer was EXACTLY right! ***** (this will almost NEVER happen)");
+				}
 				// TODO more stuff here.
-				
+			}
+			else {
+				console.log("They didn't try very hard - answer was blank - it is WRONG");
 			}
 			game.round.needsToBeGraded = false; // and we're done grading so we clear that out
 		}
@@ -222,6 +242,7 @@ $(document).ready(function() {
 		}
 		if (numberOfQuestionsRemaining === 0) {
 			console.log("Well... we're out of cake... so your options are 'or death' --- game is over (we're out of questions).");
+			alert("No more questions available to be asked - so... we need to do something else");
 			game.outOfQuestions = true;
 			return false;
 		}
@@ -240,7 +261,7 @@ $(document).ready(function() {
 		// TODO REMOVE THE ABOVE LINE - this is just for testing
 		console.log("correct answer: " + game.round.answer);
 		$("#mcAnswer" + randomNumberArray[0]).html(game.round.answer);
-		// TODO redo this where it auto finds the length of the new answers - not just a single one
+		// TODO redo this where we can have more then 3x fake answers - more specifically, the assigned number of fake answers
 		// this allows us to handle both multiple guess and fill in the blank in the same function
 		if (gameQuestions[Object.keys(gameQuestions)[randomNumber]].type == "mc") {
 			console.log("looks like a multple choice question - we need fake answers");
@@ -256,17 +277,18 @@ $(document).ready(function() {
 			console.log("fake answer3: " + game.round.fakeAnswer3);
 			$("#mcAnswer" + randomNumberArray[3]).html(game.round.fakeAnswer3);
 
-			$(".fitb").addClass("hidden");
+			$("#fitb").addClass("hidden");
+			$("#fitb-submit").addClass("hidden");
 			$(".mc").removeClass("hidden");
 
 		}
 		else if (gameQuestions[Object.keys(gameQuestions)[randomNumber]].type == "fitb") {
 			console.log("looks like a fill in the blank, we need to add blanks")
 			game.round.showBlanks = gameQuestions[Object.keys(gameQuestions)[randomNumber]].showBlanks;
-			// TODO cycle through here and add in secondary and tertiary options when needed - loop for N answers
-			var targetParent = $(".fitb")
+			var targetParent = $("#fitb")
 			targetParent.empty();
 			targetParent.removeClass("hidden");
+			$("#fitb-submit").removeClass("hidden");
 			$(".mc").addClass("hidden");
 
 			for (var i = 1; i <= game.round.showBlanks; i++) {
@@ -283,16 +305,22 @@ $(document).ready(function() {
 
 			}
 			// TODO add a submit button here
-
+			// var newSubmit = document.createElement("input");
+			// newSubmit.type = "submit";
+			// newSubmit.value = "Submit";
+			// targetParent.append(newSubmit);
 			game.round.needsToBeGraded = true;
 
+		}
+		else {
+			console.log("do we have an issue creating our questions?  we might, have a look")
 		}
 		// nuke the question so it can't be asked again until we reload the questions - decriment number of questions in game
 		delete gameQuestions[Object.keys(gameQuestions)[randomNumber]];
 		game.numberOfQuestions--;
 	}
 
-	function writeQuestionAndAnswerToScreen() {
+	function cleanUpForNextQuestion() {
 		// first we clean up
 		$("#question").empty();
 		$("#answer1").empty();
@@ -300,13 +328,9 @@ $(document).ready(function() {
 		$("#answer3").empty();
 		$("#answer4").empty();
 
-		$("#question").html(game.round.question);
+		game.round.correctAnswerStoredIn = "";
 
-
-
-
-		// correct answer written to:  
-		game.round.correctAnswerStoredIn = ""
+		// TODO more here
 	}
 
 	function getNumberOfQuestionsRemaining() {
@@ -333,16 +357,48 @@ $(document).ready(function() {
   		// While there remain elements to shuffle...
   		while (0 !== currentIndex) {
 
-	    // Pick a remaining element...
-	    randomIndex = Math.floor(Math.random() * currentIndex);
-	    currentIndex -= 1;
+		    // Pick a remaining element...
+		    randomIndex = Math.floor(Math.random() * currentIndex);
+		    currentIndex -= 1;
 
-	    // And swap it with the current element.
-	    temporaryValue = array[currentIndex];
-	    array[currentIndex] = array[randomIndex];
-	    array[randomIndex] = temporaryValue;
+	    	// And swap it with the current element.
+	    	temporaryValue = array[currentIndex];
+	    	array[currentIndex] = array[randomIndex];
+	    	array[randomIndex] = temporaryValue;
+		}
+  	return array;
 	}
 
-  return array;
-}
+	function submitAnswersForFillInTheBlank() {
+		var returnString;
+		console.log("received request to submit answer from page")
+
+		// for (var i = 0; i < game.round.showBlanks; i++) {
+		// 	console.log("getting value from page: " + $("#answer1").val());
+		// }
+	}
+
+	function processForm(e) { // nabbed from: https://stackoverflow.com/questions/5384712/capture-a-form-submit-in-javascript
+    if (e.preventDefault) e.preventDefault();
+
+    console.log("here we are submitting the form");
+    	for (var i = 1; i <= game.round.showBlanks; i++) {
+			console.log("getting value " + i + " from page: " + $("#answer" + i).val());
+			game.round.correctAnswerStoredIn += $("#answer" + i).val();
+			if (game.round.showBlanks > 1 && i != game.round.showBlanks) {
+				game.round.correctAnswerStoredIn += ", ";
+			}
+		}
+		console.log("final answer: " + game.round.correctAnswerStoredIn);
+
+    return false;
+	}
+
+	var form = document.getElementById('fitb-form'); // nabbed from: https://stackoverflow.com/questions/5384712/capture-a-form-submit-in-javascript
+		if (form.attachEvent) {
+    		form.attachEvent("submit", processForm);
+		} 
+		else {
+	    	form.addEventListener("submit", processForm);
+		}
 });

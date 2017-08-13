@@ -202,10 +202,12 @@ $(document).ready(function() {
 	function setupGame() {
 		game = {
 			numberOfQuestions:5,
+			currentQuestion:1,
 			outOfQuestions:false,
 			typeOfQuestions:"all",
 			allowFillInTheBlank:true,
 			timer:30, // TODO assume seconds - 0 is 'infinite', otherwise just seconds
+			roundInPlay:true,
 			round: {
 				question:"",
 				answer:"",
@@ -253,13 +255,18 @@ $(document).ready(function() {
 		setupGame();
 
 		console.log("This will be a " + game.numberOfQuestions + " question long game.")
+		for (var i = 1; i <= game.numberOfQuestions; i++) {
+			$("#displayRoundHere").html("Round " + game.currentQuestion + " of " + game.numberOfQuestions);
+			game.roundInPlay = true;
+			while (game.roundInPlay) {
+				getOneRandomQuestionAndRemoveItFromPool();
+				console.log("ergh.")
+			}
+			console.log("end of the loop - again?");
+
+		}
 		
-		getOneRandomQuestionAndRemoveItFromPool();
 
-		// for (var i = 0; i < game.numberOfQuestions; i++) {
-			
-
-		// }
 
 	}
 
@@ -378,7 +385,8 @@ $(document).ready(function() {
 		}
 		// nuke the question so it can't be asked again until we reload the questions - decriment number of questions in game
 		delete gameQuestions[Object.keys(gameQuestions)[randomNumber]];
-		game.numberOfQuestions--;
+		game.currentQuestion++;
+		game.roundInPlay = false;
 	}
 
 	function cleanUpForNextQuestion() {
@@ -430,7 +438,6 @@ $(document).ready(function() {
 	function processForm(e) { // nabbed from: https://stackoverflow.com/questions/5384712/capture-a-form-submit-in-javascript
     if (e.preventDefault) e.preventDefault();
 
-    console.log("here we are submitting the form");
     	for (var i = 1; i <= game.round.showBlanks; i++) {
 			console.log("getting value " + i + " from page: " + $("#answer" + i).val());
 			game.round.answerToBeGraded += $("#answer" + i).val();

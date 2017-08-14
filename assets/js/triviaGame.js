@@ -117,14 +117,6 @@ $(document).ready(function() {
 		// time to answer (make this variable? ... why not? --- zero is infinite, otherwise use # of seconds)
 		// time after answer (make this variable? ... why not? --- zero is infinite, otherwise use # of seconds)
 
-	var game = {};
-	var gameQuestions = {};
-	// beginGame();
-	setupGame();
-	game.roundMaxTime = 5;
-
-	gameLoop(game.currentQuestion, game.numberOfQuestions);
-
 	// TODO:  Advanced setup:  
 		// Setup Teams
 		// Option to only get one question before rotating - GOING WITH THIS METHOD (other is boring for other teams)
@@ -155,19 +147,24 @@ $(document).ready(function() {
 
 	// TODO remove question from list when already answered - so next game has new questions - DONE
 
+	var game = {};
+	var gameQuestions = {};
+	beginGame();
+	game.roundMaxTime = 5;
+
+
+
 	function setupGame() {
 		game = {
-			numberOfQuestions:5,
-			currentQuestion:1,
+			numberOfQuestions:3,
+			currentQuestion:0,
 			outOfQuestions:false,
-			questionTypesSelected:[generalQuestionsMultipleChoice, 
-									geographyQuestionsMultipleChoice
-									// ];
-									, 
-									generalQuestionsFillInTheBlank, 
+			questionTypesSelected:[generalQuestionsMultipleChoice,
+									geographyQuestionsMultipleChoice,
+									generalQuestionsFillInTheBlank,
 									geographyQuestionsFillInTheBlank],
 			roundMaxTime:30, // TODO assume seconds - 0 is 'infinite', otherwise just seconds
-			roundInPlay:true, // TODO do I need this? 
+			// roundInPlay:true, // TODO do I need this? 
 			round: {
 				question:"",
 				answer:"",
@@ -188,15 +185,11 @@ $(document).ready(function() {
 				pauseLength:3,
 				start: function() {
 					console.log("****starting game timer called using : " + game.gameTimer.timer + " and clock is running: " + game.gameTimer.clockRunning + "*****")
-					if (game.gameTimer.pause) {
-						
-					}
-					else if (!game.gameTimer.clockRunning) {
-						$("#scoreScreen").removeClass("hidden"); // TODO seems like we should NOT need this
+					if (!game.gameTimer.clockRunning) {
 						game.gameTimer.resetClock();
         				game.timeInterval = setInterval(game.gameTimer.count, 1000);
         				game.gameTimer.clockRunning = true;
-        				getOneRandomQuestionAndRemoveItFromPool();
+        				
       				}
       				else if (game.gameTimer.clockRunning) {
       					console.log("GameTimer Start was called with clock running - this is baaaddd mmmmkay");
@@ -207,23 +200,34 @@ $(document).ready(function() {
     				game.gameTimer.clockRunning = false;
 				},
 				count: function() {
-					console.log("COUNT: initial call "  + game.gameTimer.timer + " clock running is: " + game.gameTimer.clockRunning);
+					console.log("COUNT: initial call "  + game.gameTimer.timer + " clock running is: " + game.gameTimer.clockRunning + " paused: " + game.gameTimer.pause);
+					console.log("Just because: " + game.currentQuestion);
+
 					if (game.gameTimer.pause) {
 						console.log("game is paused for something...?");
 						$("#scoreScreen").removeClass("hidden");
 					}
-					else if ((game.gameTimer.timer <= game.roundMaxTime) && (game.gameTimer.timer > 0)) {
-    					game.gameTimer.timer--;
-    				}
-    				else if (game.gameTimer.timer <= 0) {
-    					console.log("COUNT: game timer is: " + game.gameTimer.timer + " clock running is: " + game.gameTimer.clockRunning);
-    					console.log("time is up!");
-    					game.gameTimer.stop();
-    					// TODO display splash screen with score for 3 seconds
-    					game.gameTimer.displayScoreScreen();
-    				}
-    				else {
-    					console.log("we appear to have an issue with gametimer counting");
+					else if (!game.gameTimer.pause) {
+						console.log("game is unpaused - continuing");
+						$("#scoreScreen").addClass("hidden");
+					
+						if ((game.gameTimer.timer <= game.roundMaxTime) && (game.gameTimer.timer > 0)) {
+	    					game.gameTimer.timer--;
+	    				}
+	    				else if (game.gameTimer.timer <= 0) {
+	    					console.log("COUNT: game timer is: " + game.gameTimer.timer + " clock running is: " + game.gameTimer.clockRunning);
+	    					console.log("time is up!");
+	    					game.gameTimer.pause = true;
+	    				}
+	    				else if (game.gameTimer.timer > game.roundMaxTime) {
+	    					game.gameTimer.timer = game.roundMaxTime;
+	    					game.gameTimer.timer--;
+	    					console.log("time was above max somehow - look into this");
+	    				}
+	    				else {
+	    					console.log("we appear to have an issue with gametimer counting");
+	    					console.log(game.gameTimer.timer + "/" + game.roundMaxTime);
+	    				}
     				}
     				$("#displayTimeHere").html("Time Remaining: " + game.gameTimer.timeConverter(game.gameTimer.timer));
   				},
@@ -231,37 +235,26 @@ $(document).ready(function() {
   					game.gameTimer.timer = game.roundMaxTime;
   				},
   				displayScoreScreen: function () {
-  
 					$("#scoreScreen").removeClass("hidden");
-  						
 
   					if (game.currentQuestion <= game.numberOfQuestions) {
   						console.log("Display Score Screen:  We have asked " + game.currentQuestion + " questions out of: " + game.numberOfQuestions);
   						
   						console.log("pausing for a few moments to observe the score");
   						game.gameTimer.pause = true;
-  						game.gameTimer.start();
   					}
   					else {
   						console.log("display score will stay lit, no more questions to ask")
   					}
   				},
-  				// shortPause: function () {
-  				// 	console.log("Asked to pause for (s -- converted to ms): " + game.gameTimer.pauseLength);
-  				// },
-  				// pause: function() {
-  				// 	if (game.gameTimer.pause) {
-  				// 		game.gameTimer.pause = false;
-  				// 	}
-  				// 	else if (game.gameTimer.pause = false) {
-  				// 		game.gameTimer.pause = true;
-  				// 	}
-  				// 	else {
-  				// 		console.log("Gametimer Pause:  something happened, how'd we get here?")
-  				// 	}
-  				// },
-				timeConverter: function (t) { 
+  				nextQuestion: function() {
+  					game.gameTimer.stop();
+  					game.currentQuestion++;
+  					getOneRandomQuestionAndRemoveItFromPool();
 
+  					game.gameTimer.start();
+  				},
+				timeConverter: function (t) { 
 				    //  Takes the current time in seconds and convert it to minutes and seconds (mm:ss).
 				    var minutes = Math.floor(t / 60);
 				    var seconds = t - (minutes * 60);
@@ -273,11 +266,6 @@ $(document).ready(function() {
 				    if (minutes === 0) {
 				      minutes = "0";
 				    }
-
-				    // else if (minutes < 10) {
-				    //   minutes = "0" + minutes;
-				    // }
-
 				    return minutes + ":" + seconds;
   				}
   			},
@@ -312,20 +300,8 @@ $(document).ready(function() {
 
 	function beginGame() {
 		setupGame();
-
-		console.log("This will be a " + game.numberOfQuestions + " question long game.")
-		$("#displayRoundHere").html("Round " + game.currentQuestion + " of " + game.numberOfQuestions);
-		gameLoop(game.currentQuestion, game.numberOfQuestions);
-	}
-
-	function gameLoop (currentTime, howManyTimes) {
-		if (currentTime < howManyTimes) {
-			game.gameTimer.start();
-		}
-		else {
-			console.log("game appears to be finished");
-		}
-
+		console.log("This will be a " + game.numberOfQuestions + " question long game.");
+		game.gameTimer.nextQuestion();
 	}
 
 	function getAllQuestions(typeOfQuestionArray) {
@@ -344,7 +320,6 @@ $(document).ready(function() {
 
 	function getOneRandomQuestionAndRemoveItFromPool() {
 		console.log("===== We're in get one question from pool: =====");
-		//alert("getting question: " + game.currentQuestion + " from pool")
 
 		if (game.round.needsToBeGraded) {
 			console.log("Yikes!  We should grade their answer before getting our own question!");
@@ -445,20 +420,18 @@ $(document).ready(function() {
 			}
 			game.round.needsToBeGraded = true;
 			game.round.answerToBeGraded = "";
-			
-
 		}
 		else {
 			console.log("do we have an issue creating our questions?  we might, have a look")
 		}
 		// nuke the question so it can't be asked again until we reload the questions - decriment number of questions in game
 		delete gameQuestions[Object.keys(gameQuestions)[randomNumber]];
-		game.currentQuestion++;
+		$(".displayRoundHere").html("Round " + game.currentQuestion + " of " + game.numberOfQuestions);
+
 	}
 
 	function cleanUpForNextQuestion() {
 
-		console.log("cleaning up");
 		// first we clean up
 		$("#question").empty();
 		game.round.needsToBeGraded = false;
@@ -516,10 +489,10 @@ $(document).ready(function() {
 		}
 		console.log("final answer: " + game.round.answerToBeGraded);
 		console.log("stopping clock with " + game.gameTimer.timer + " seconds remaining")
-		game.gameTimer.stop();
-		// TODO on submit change to next question.  
+		game.gameTimer.pause = true;
+		game.gameTimer.timer = 0;
 
-    return false;
+    	return false;
 	}
 
 	var form = document.getElementById('fitb-form'); // nabbed from: https://stackoverflow.com/questions/5384712/capture-a-form-submit-in-javascript
@@ -529,5 +502,24 @@ $(document).ready(function() {
 		else {
 	    	form.addEventListener("submit", processForm);
 		}
+
+	$("#scoreScreen").click(function () {
+		console.log("request received to dismiss score screen and continue");
+		console.log("validating... current question num: " + game.currentQuestion + " >= " + game.numberOfQuestions + "?  if yes, keep going")
+		$(".displayRoundHere").html("Round " + game.currentQuestion + " of " + game.numberOfQuestions);
+
+		if (game.currentQuestion >= game.numberOfQuestions) {
+			console.log("Click to continue:  No, game is over!");
+			game.gameTimer.stop();
+			//$("#scoreScreen").removeClass("hidden");
+			
+		}
+		else {			
+			console.log("Click to continue:  Ok");
+			game.gameTimer.pause = false;
+			game.gameTimer.nextQuestion();
+			$("#scoreScreen").addClass("hidden");
+		}
+	});
 
 });

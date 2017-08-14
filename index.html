@@ -24,7 +24,7 @@
 	</container>
 	<container id="" class="text-center">
 			<row>
-				<h1 id="displayRoundHere" class="col-xs-6 col-sm-6 col-md-6 col-lg-6">Let's play Trivia!</h1>
+				<h1 id="displayRoundHere" class="displayRoundHere col-xs-6 col-sm-6 col-md-6 col-lg-6">Let's play Trivia!</h1>
 				<h1 id="displayTimeHere" class="col-xs-6 col-sm-6 col-md-6 col-lg-6">Time Remaining:</h1>
 			</row>
 			<row>
@@ -39,13 +39,17 @@
 				</div>
 			</row>
 				<form id="fitb-form">
+				<row>
 					<div id="fitb" class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 					</div>
+				</row>
+				<row>
 					<div class="empty col-xs-4 col-sm-4 col-md-4 col-lg-4"></div>
 					<div id="fitb-submit" class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
 						<button type="submit" class="form-control">Submit Answers</button>
 					</div>
 					<div class="empty col-xs-4 col-sm-4 col-md-4 col-lg-4"></div>
+				</row>
 				</form>
 			<row class="mc" class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 				<div>
@@ -68,8 +72,9 @@
 				</div>
 			</row>
 	</container>
-	<div id="scoreScreen" class="hidden absolute">
-		<div>The score is here!</div>
+	<div id="scoreScreen" class="hidden absolute text-center">
+		<div>The score is here! (click to contine)</div>
+		<div class="displayRoundHere"></div>
 	</div>
 </body>
 </html>

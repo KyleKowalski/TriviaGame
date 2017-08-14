@@ -119,15 +119,14 @@ $(document).ready(function() {
 
 	var game = {};
 	var gameQuestions = {};
-	var timer;
-
+	// beginGame();
 	setupGame();
+	game.roundMaxTime = 5;
 
-	game.gameTimer.start();
+	gameLoop(game.currentQuestion, game.numberOfQuestions);
 
 	// TODO:  Advanced setup:  
 		// Setup Teams
-		// Option to answer again and again if correct - PASS
 		// Option to only get one question before rotating - GOING WITH THIS METHOD (other is boring for other teams)
 
 	// TODO:  Pause button (longer games will need it - throw up a splash screen so that the game is not visible?)
@@ -135,25 +134,24 @@ $(document).ready(function() {
 
 	// load questions based on above criteria
 	
-	// // TODO this will be in some kind of loop
+	// TODO this will be in some kind of loop
 	
-	// getOneRandomQuestionAndRemoveItFromPool();
 	
-	//beginGame();
+	
 
 	// randomize questions - DONE
 
-	// start timer
+	// start timer - DONE
 
 	// show question - DONE
 
 	// dynamically build answers - DONE
 
-	// on click user answers or timeout
+	// on click user answers or timeout - MC NO - FITB DONE
 
 	// correct or incorrect or timeout counters go up
 
-	// load next question
+	// load next question - DONE
 
 	// TODO remove question from list when already answered - so next game has new questions - DONE
 
@@ -168,7 +166,7 @@ $(document).ready(function() {
 									, 
 									generalQuestionsFillInTheBlank, 
 									geographyQuestionsFillInTheBlank],
-			roundMaxTime:10, // TODO assume seconds - 0 is 'infinite', otherwise just seconds
+			roundMaxTime:30, // TODO assume seconds - 0 is 'infinite', otherwise just seconds
 			roundInPlay:true, // TODO do I need this? 
 			round: {
 				question:"",
@@ -183,17 +181,22 @@ $(document).ready(function() {
 				answerToBeGraded:""
 			},
 
-			gameTimer: { // modeled after an example from class
-				// timeInterval:"",
+			gameTimer: { 
 				timer:0,
 				clockRunning:false,
+				pause:false,
+				pauseLength:3,
 				start: function() {
-					game.gameTimer.resetClock();
 					console.log("****starting game timer called using : " + game.gameTimer.timer + " and clock is running: " + game.gameTimer.clockRunning + "*****")
-					if (!game.gameTimer.clockRunning) {
-						//game.gameTimer.resetClock();
+					if (game.gameTimer.pause) {
+						
+					}
+					else if (!game.gameTimer.clockRunning) {
+						$("#scoreScreen").removeClass("hidden"); // TODO seems like we should NOT need this
+						game.gameTimer.resetClock();
         				game.timeInterval = setInterval(game.gameTimer.count, 1000);
         				game.gameTimer.clockRunning = true;
+        				getOneRandomQuestionAndRemoveItFromPool();
       				}
       				else if (game.gameTimer.clockRunning) {
       					console.log("GameTimer Start was called with clock running - this is baaaddd mmmmkay");
@@ -205,13 +208,19 @@ $(document).ready(function() {
 				},
 				count: function() {
 					console.log("COUNT: initial call "  + game.gameTimer.timer + " clock running is: " + game.gameTimer.clockRunning);
-					if ((game.gameTimer.timer <= game.roundMaxTime) && (game.gameTimer.timer > 0)) {
+					if (game.gameTimer.pause) {
+						console.log("game is paused for something...?");
+						$("#scoreScreen").removeClass("hidden");
+					}
+					else if ((game.gameTimer.timer <= game.roundMaxTime) && (game.gameTimer.timer > 0)) {
     					game.gameTimer.timer--;
     				}
     				else if (game.gameTimer.timer <= 0) {
     					console.log("COUNT: game timer is: " + game.gameTimer.timer + " clock running is: " + game.gameTimer.clockRunning);
     					console.log("time is up!");
     					game.gameTimer.stop();
+    					// TODO display splash screen with score for 3 seconds
+    					game.gameTimer.displayScoreScreen();
     				}
     				else {
     					console.log("we appear to have an issue with gametimer counting");
@@ -221,17 +230,36 @@ $(document).ready(function() {
   				resetClock: function() {
   					game.gameTimer.timer = game.roundMaxTime;
   				},
-  				pause: function() {
-  					if (game.gameTimer.pause) {
-  						game.gameTimer.pause = false;
-  					}
-  					else if (game.gameTimer.pause = false) {
+  				displayScoreScreen: function () {
+  
+					$("#scoreScreen").removeClass("hidden");
+  						
+
+  					if (game.currentQuestion <= game.numberOfQuestions) {
+  						console.log("Display Score Screen:  We have asked " + game.currentQuestion + " questions out of: " + game.numberOfQuestions);
+  						
+  						console.log("pausing for a few moments to observe the score");
   						game.gameTimer.pause = true;
+  						game.gameTimer.start();
   					}
   					else {
-  						console.log("Gametimer Pause:  something happened, how'd we get here?")
+  						console.log("display score will stay lit, no more questions to ask")
   					}
   				},
+  				// shortPause: function () {
+  				// 	console.log("Asked to pause for (s -- converted to ms): " + game.gameTimer.pauseLength);
+  				// },
+  				// pause: function() {
+  				// 	if (game.gameTimer.pause) {
+  				// 		game.gameTimer.pause = false;
+  				// 	}
+  				// 	else if (game.gameTimer.pause = false) {
+  				// 		game.gameTimer.pause = true;
+  				// 	}
+  				// 	else {
+  				// 		console.log("Gametimer Pause:  something happened, how'd we get here?")
+  				// 	}
+  				// },
 				timeConverter: function (t) { 
 
 				    //  Takes the current time in seconds and convert it to minutes and seconds (mm:ss).
@@ -243,7 +271,7 @@ $(document).ready(function() {
 				    }
 
 				    if (minutes === 0) {
-				      minutes = "00";
+				      minutes = "0";
 				    }
 
 				    // else if (minutes < 10) {
@@ -278,7 +306,7 @@ $(document).ready(function() {
 
 			// TODO select number of questions, timer, etc
 
-			//gameQuestions = getAllQuestions(game.questionTypesSelected);
+			gameQuestions = getAllQuestions(game.questionTypesSelected);
 				
 	}
 
@@ -286,14 +314,16 @@ $(document).ready(function() {
 		setupGame();
 
 		console.log("This will be a " + game.numberOfQuestions + " question long game.")
-		for (var i = 1; i <= game.numberOfQuestions; i++) {
-			$("#displayRoundHere").html("Round " + game.currentQuestion + " of " + game.numberOfQuestions);
-			game.roundInPlay = true;
-			while (game.roundInPlay) {
-				getOneRandomQuestionAndRemoveItFromPool();
-			}
-			console.log("end of the loop - again?");
+		$("#displayRoundHere").html("Round " + game.currentQuestion + " of " + game.numberOfQuestions);
+		gameLoop(game.currentQuestion, game.numberOfQuestions);
+	}
 
+	function gameLoop (currentTime, howManyTimes) {
+		if (currentTime < howManyTimes) {
+			game.gameTimer.start();
+		}
+		else {
+			console.log("game appears to be finished");
 		}
 
 	}
@@ -303,12 +333,12 @@ $(document).ready(function() {
 		var questionObject = {};
 		typeOfQuestionArray.forEach(function(item){
 			var thisItem = item;
-			console.log("adding this: ");
-			console.log(thisItem);
+			// console.log("adding this: ");
+			// console.log(thisItem);
 			questionObject = Object.assign(questionObject, thisItem);
 		});
-		console.log("and we have this total: ");
-		console.log(questionObject);
+		// console.log("adding this question object to total: ");
+		// console.log(questionObject);
 		return questionObject;
 	}
 
@@ -424,9 +454,6 @@ $(document).ready(function() {
 		// nuke the question so it can't be asked again until we reload the questions - decriment number of questions in game
 		delete gameQuestions[Object.keys(gameQuestions)[randomNumber]];
 		game.currentQuestion++;
-		game.roundInPlay = false;
-
-		game.gameTimer.start();
 	}
 
 	function cleanUpForNextQuestion() {

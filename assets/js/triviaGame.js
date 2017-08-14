@@ -121,6 +121,10 @@ $(document).ready(function() {
 	var gameQuestions = {};
 	var timer;
 
+	setupGame();
+
+	game.gameTimer.start();
+
 	// TODO:  Advanced setup:  
 		// Setup Teams
 		// Option to answer again and again if correct - PASS
@@ -135,7 +139,7 @@ $(document).ready(function() {
 	
 	// getOneRandomQuestionAndRemoveItFromPool();
 	
-	beginGame();
+	//beginGame();
 
 	// randomize questions - DONE
 
@@ -164,12 +168,8 @@ $(document).ready(function() {
 									, 
 									generalQuestionsFillInTheBlank, 
 									geographyQuestionsFillInTheBlank],
-			//allowFillInTheBlank:true,
-			timeInterval:"",
-			timer:0,
-			clockRunning:true,
-			roundMaxTime:30, // TODO assume seconds - 0 is 'infinite', otherwise just seconds
-			roundInPlay:true,
+			roundMaxTime:10, // TODO assume seconds - 0 is 'infinite', otherwise just seconds
+			roundInPlay:true, // TODO do I need this? 
 			round: {
 				question:"",
 				answer:"",
@@ -183,32 +183,55 @@ $(document).ready(function() {
 				answerToBeGraded:""
 			},
 
-			gameTimer: { // nabbed from class examples
-
+			gameTimer: { // modeled after an example from class
+				// timeInterval:"",
+				timer:0,
+				clockRunning:false,
 				start: function() {
-					console.log("****starting game timer at: " + game.roundMaxTime + "*****")
-					if (!game.clockRunning) {
+					game.gameTimer.resetClock();
+					console.log("****starting game timer called using : " + game.gameTimer.timer + " and clock is running: " + game.gameTimer.clockRunning + "*****")
+					if (!game.gameTimer.clockRunning) {
+						//game.gameTimer.resetClock();
         				game.timeInterval = setInterval(game.gameTimer.count, 1000);
-        				clockRunning = true;
+        				game.gameTimer.clockRunning = true;
+      				}
+      				else if (game.gameTimer.clockRunning) {
+      					console.log("GameTimer Start was called with clock running - this is baaaddd mmmmkay");
       				}
   				},
-
-  				stop: function() {
-
+				stop: function() {
     				clearInterval(game.timeInterval);
-    				clockRunning = false;
+    				game.gameTimer.clockRunning = false;
 				},
 				count: function() {
-					console.log("starting counting")
-					if (game.timer <= game.roundMaxTime) {
-    					game.timer++;
-	   					$("#displayTimeHere").html("Time Remaining: " + game.gameTimer.timeConverter(game.timer));
+					console.log("COUNT: initial call "  + game.gameTimer.timer + " clock running is: " + game.gameTimer.clockRunning);
+					if ((game.gameTimer.timer <= game.roundMaxTime) && (game.gameTimer.timer > 0)) {
+    					game.gameTimer.timer--;
+    				}
+    				else if (game.gameTimer.timer <= 0) {
+    					console.log("COUNT: game timer is: " + game.gameTimer.timer + " clock running is: " + game.gameTimer.clockRunning);
+    					console.log("time is up!");
+    					game.gameTimer.stop();
     				}
     				else {
-    					game.gametimer.stop
+    					console.log("we appear to have an issue with gametimer counting");
     				}
+    				$("#displayTimeHere").html("Time Remaining: " + game.gameTimer.timeConverter(game.gameTimer.timer));
   				},
-
+  				resetClock: function() {
+  					game.gameTimer.timer = game.roundMaxTime;
+  				},
+  				pause: function() {
+  					if (game.gameTimer.pause) {
+  						game.gameTimer.pause = false;
+  					}
+  					else if (game.gameTimer.pause = false) {
+  						game.gameTimer.pause = true;
+  					}
+  					else {
+  						console.log("Gametimer Pause:  something happened, how'd we get here?")
+  					}
+  				},
 				timeConverter: function (t) { 
 
 				    //  Takes the current time in seconds and convert it to minutes and seconds (mm:ss).
@@ -223,9 +246,9 @@ $(document).ready(function() {
 				      minutes = "00";
 				    }
 
-				    else if (minutes < 10) {
-				      minutes = "0" + minutes;
-				    }
+				    // else if (minutes < 10) {
+				    //   minutes = "0" + minutes;
+				    // }
 
 				    return minutes + ":" + seconds;
   				}
@@ -255,7 +278,7 @@ $(document).ready(function() {
 
 			// TODO select number of questions, timer, etc
 
-			gameQuestions = getAllQuestions(game.questionTypesSelected);
+			//gameQuestions = getAllQuestions(game.questionTypesSelected);
 				
 	}
 
@@ -298,10 +321,10 @@ $(document).ready(function() {
 			// TODO Add grading stuff here
 			if (game.round.answerToBeGraded !== "") {
 				alert("previous question needs to be graded... question: " + game.round.question + " answer:" + game.round.answerToBeGraded);
-				if (game.round.answer.toLowerCase() == game.round.answerToBeGraded.toLowerCase()) {
+				if (game.round.answer.toLowerCase() === game.round.answerToBeGraded.toLowerCase()) {
 					console.log("*****AMAZING!!!!  The answer was EXACTLY right! ***** (this will almost NEVER happen)");
 				}
-				// TODO more stuff here?
+				// TODO more stuff here - how do we grade and what happens.  
 			}
 			else {
 				console.log("They didn't try very hard - answer was blank - it is WRONG");
@@ -368,7 +391,7 @@ $(document).ready(function() {
 			$(".mc").removeClass("hidden");
 
 		}
-		else if (gameQuestions[Object.keys(gameQuestions)[randomNumber]].type == "fitb") {
+		else if (gameQuestions[Object.keys(gameQuestions)[randomNumber]].type === "fitb") {
 			console.log("looks like a fill in the blank, we need to add blanks")
 			game.round.showBlanks = gameQuestions[Object.keys(gameQuestions)[randomNumber]].showBlanks;
 			var targetParent = $("#fitb")
@@ -403,7 +426,7 @@ $(document).ready(function() {
 		game.currentQuestion++;
 		game.roundInPlay = false;
 
-		game.gameTimer.start;
+		game.gameTimer.start();
 	}
 
 	function cleanUpForNextQuestion() {
@@ -465,7 +488,8 @@ $(document).ready(function() {
 			}
 		}
 		console.log("final answer: " + game.round.answerToBeGraded);
-
+		console.log("stopping clock with " + game.gameTimer.timer + " seconds remaining")
+		game.gameTimer.stop();
 		// TODO on submit change to next question.  
 
     return false;

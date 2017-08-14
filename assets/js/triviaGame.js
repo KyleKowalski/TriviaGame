@@ -119,40 +119,7 @@ $(document).ready(function() {
 
 	var game = {};
 	var gameQuestions = {};
-		// 	numberOfQuestions:5,
-	// 	outOfQuestions:false,
-	// 	typeOfQuestions:"all",
-	// 	// TODO teams
-	// 	// TODO team members
-	// 	allowFillInTheBlank:true,
-	// 	timer:30, // assume seconds - 0 is 'infinite', otherwise just seconds
-	// 	round: {
-	// 		question:"",
-	// 		answer:"",
-	// 		type:"",
-	// 		fakeAnswer1:"",
-	// 		fakeAnswer2:"",
-	// 		fakeAnswer3:"",
-	// 		correctAnswerStoredIn:"",
-	// 		showBlanks:"",
-	// 		needsToBeGraded:"",
-	// 		answerToBeGraded:""  // separate by...?  something?  
-	// 	},
-	// 	team1: { // TODO dynamically create me
-	// 		members:"",
-	// 		correctAnswers:0,
-	// 		incorrectAnswers:0,
-	// 		needTieBreaker:false
-	// 	},
-	// 	team2: {// TODO dynamically create me 
-	// 		members:"",
-	// 		correctAnswers:0,
-	// 		incorrectAnswers:0,
-	// 		needTieBreaker:false
-	// 	}
-	// }
-
-
+	var timer;
 
 	// TODO:  Advanced setup:  
 		// Setup Teams
@@ -162,20 +129,7 @@ $(document).ready(function() {
 	// TODO:  Pause button (longer games will need it - throw up a splash screen so that the game is not visible?)
 		// limit to 3x pauses or what not?
 
-
-	
-
 	// load questions based on above criteria
-
-	// get questions --- based on user select of type 
-	// var questionTypesSelected = [generalQuestionsMultipleChoice, 
-	// 							geographyQuestionsMultipleChoice
-	// 							// ];
-	// 							, 
-	// 							generalQuestionsFillInTheBlank, 
-	// 							geographyQuestionsFillInTheBlank];
-	// var gameQuestions = getAllQuestions(questionTypesSelected);
-	
 	
 	// // TODO this will be in some kind of loop
 	
@@ -204,9 +158,17 @@ $(document).ready(function() {
 			numberOfQuestions:5,
 			currentQuestion:1,
 			outOfQuestions:false,
-			typeOfQuestions:"all",
-			allowFillInTheBlank:true,
-			timer:30, // TODO assume seconds - 0 is 'infinite', otherwise just seconds
+			questionTypesSelected:[generalQuestionsMultipleChoice, 
+									geographyQuestionsMultipleChoice
+									// ];
+									, 
+									generalQuestionsFillInTheBlank, 
+									geographyQuestionsFillInTheBlank],
+			//allowFillInTheBlank:true,
+			timeInterval:"",
+			timer:0,
+			clockRunning:true,
+			roundMaxTime:30, // TODO assume seconds - 0 is 'infinite', otherwise just seconds
 			roundInPlay:true,
 			round: {
 				question:"",
@@ -220,35 +182,81 @@ $(document).ready(function() {
 				needsToBeGraded:false,
 				answerToBeGraded:""
 			},
-			team1: { // TODO dynamically create me
-				members:"", // TODO add
-				correctAnswers:0, // TODO add
-				incorrectAnswers:0, // TODO add
-				needTieBreaker:false // TODO add
-			},
-			team2: {// TODO dynamically create me 
-				members:"", // TODO add
-				correctAnswers:0, // TODO add
-				incorrectAnswers:0, // TODO add
-				needTieBreaker:false // TODO add
-			}
-		}	
 
-		// TODO establish teams (screens and prompts)
+			gameTimer: { // nabbed from class examples
 
-		// TODO select question types dynamically
+				start: function() {
+					console.log("****starting game timer at: " + game.roundMaxTime + "*****")
+					if (!game.clockRunning) {
+        				game.timeInterval = setInterval(game.gameTimer.count, 1000);
+        				clockRunning = true;
+      				}
+  				},
 
-		// TODO select number of questions, timer, etc
+  				stop: function() {
 
-		var questionTypesSelected = [generalQuestionsMultipleChoice, 
-								geographyQuestionsMultipleChoice
-								// ];
-								, 
-								generalQuestionsFillInTheBlank, 
-								geographyQuestionsFillInTheBlank];
-		gameQuestions = getAllQuestions(questionTypesSelected);
+    				clearInterval(game.timeInterval);
+    				clockRunning = false;
+				},
+				count: function() {
+					console.log("starting counting")
+					if (game.timer <= game.roundMaxTime) {
+    					game.timer++;
+	   					$("#displayTimeHere").html("Time Remaining: " + game.gameTimer.timeConverter(game.timer));
+    				}
+    				else {
+    					game.gametimer.stop
+    				}
+  				},
+
+				timeConverter: function (t) { 
+
+				    //  Takes the current time in seconds and convert it to minutes and seconds (mm:ss).
+				    var minutes = Math.floor(t / 60);
+				    var seconds = t - (minutes * 60);
+
+				    if (seconds < 10) {
+				      seconds = "0" + seconds;
+				    }
+
+				    if (minutes === 0) {
+				      minutes = "00";
+				    }
+
+				    else if (minutes < 10) {
+				      minutes = "0" + minutes;
+				    }
+
+				    return minutes + ":" + seconds;
+  				}
+  			},
 			
-	
+
+				team1: { // TODO dynamically create me
+					teamName:"Team Human", // TODO add
+					members:"Kyle", // TODO add
+					correctAnswers:0, // TODO add
+					incorrectAnswers:0, // TODO add
+					needTieBreaker:false // TODO add
+				},
+				
+				team2: {// TODO dynamically create me 
+					teamName:"Team Bot", // TODO add
+					members:"Robot", // TODO add
+					correctAnswers:0, // TODO add
+					incorrectAnswers:0, // TODO add
+					needTieBreaker:false // TODO add
+				}
+			}
+
+			// TODO establish teams (screens and prompts)
+
+			// TODO select question types dynamically
+
+			// TODO select number of questions, timer, etc
+
+			gameQuestions = getAllQuestions(game.questionTypesSelected);
+				
 	}
 
 	function beginGame() {
@@ -260,13 +268,10 @@ $(document).ready(function() {
 			game.roundInPlay = true;
 			while (game.roundInPlay) {
 				getOneRandomQuestionAndRemoveItFromPool();
-				console.log("ergh.")
 			}
 			console.log("end of the loop - again?");
 
 		}
-		
-
 
 	}
 
@@ -286,8 +291,9 @@ $(document).ready(function() {
 
 	function getOneRandomQuestionAndRemoveItFromPool() {
 		console.log("===== We're in get one question from pool: =====");
+		//alert("getting question: " + game.currentQuestion + " from pool")
 
-		if (game.round.needsToBeGraded = true) {
+		if (game.round.needsToBeGraded) {
 			console.log("Yikes!  We should grade their answer before getting our own question!");
 			// TODO Add grading stuff here
 			if (game.round.answerToBeGraded !== "") {
@@ -295,47 +301,55 @@ $(document).ready(function() {
 				if (game.round.answer.toLowerCase() == game.round.answerToBeGraded.toLowerCase()) {
 					console.log("*****AMAZING!!!!  The answer was EXACTLY right! ***** (this will almost NEVER happen)");
 				}
-				// TODO more stuff here.
+				// TODO more stuff here?
 			}
 			else {
 				console.log("They didn't try very hard - answer was blank - it is WRONG");
 			}
 			game.round.needsToBeGraded = false; // and we're done grading so we clear that out
+			console.log("finished grading, on to next question");
 		}
-		console.log("finished grading, on to next question");
+		
 		cleanUpForNextQuestion();
 
 		var numberOfQuestionsRemaining = getNumberOfQuestionsRemaining();
 
-		console.log("Questions remaining in game: " + game.numberOfQuestions + " questions remaining to be asked: " + numberOfQuestionsRemaining);
-		if (numberOfQuestionsRemaining < game.numberOfQuestions) {
+		console.log("Questions remaining in game (after this one): " + (game.numberOfQuestions - game.currentQuestion) + " questions remaining to be asked: " + numberOfQuestionsRemaining);
+		if (numberOfQuestionsRemaining < (game.numberOfQuestions - game.currentQuestion)) {
 			// TODO need to handle this more gracefully
 			console.log("***** WARNING ***** not enough questions to finish the game");
 		}
 		if (numberOfQuestionsRemaining === 0) {
 			console.log("Well... we're out of cake... so your options are 'or death' --- game is over (we're out of questions).");
 			alert("No more questions available to be asked - so... we need to do something else");
+			// TODO prompt for a question deck reload?
 			game.outOfQuestions = true;
 			return false;
 		}
-
 		var randomNumber = Math.floor(Math.random() * numberOfQuestionsRemaining);
-		var randomNumberArray = createAndShuffleRandomNumberArray(4); // TODO this should be the length of the answers, not hard coded
-
 		game.round.question = gameQuestions[Object.keys(gameQuestions)[randomNumber]].question;
 		console.log("question: " + game.round.question);
 		$("#question").html("<h1>" + game.round.question + "</h1>");
 		game.round.answer = gameQuestions[Object.keys(gameQuestions)[randomNumber]].answer;
-		game.round.correctAnswerStoredIn = "#mcAnswer" + randomNumberArray[0];
 
-		// TODO REMOVE THE FOLLOWING LINE - this is just for testing
-		$("#mcAnswer" + randomNumberArray[0]).addClass("bg-success");
-		// TODO REMOVE THE ABOVE LINE - this is just for testing
-		console.log("correct answer: " + game.round.answer);
-		$("#mcAnswer" + randomNumberArray[0]).html(game.round.answer);
-		// TODO redo this where we can have more then 3x fake answers - more specifically, the assigned number of fake answers
-		// this allows us to handle both multiple guess and fill in the blank in the same function
 		if (gameQuestions[Object.keys(gameQuestions)[randomNumber]].type == "mc") {
+			
+			var randomNumberArray = createAndShuffleRandomNumberArray(4); // TODO this should be the length of the answers, not hard coded
+
+			//game.round.answer = gameQuestions[Object.keys(gameQuestions)[randomNumber]].answer;
+			game.round.correctAnswerStoredIn = "#mcAnswer" + randomNumberArray[0];
+
+			// TODO REMOVE THE FOLLOWING LINE - this is just for testing
+			$("#mcAnswer" + randomNumberArray[0]).addClass("bg-success");
+			$("#mcAnswer" + randomNumberArray[1]).removeClass("bg-success");
+			$("#mcAnswer" + randomNumberArray[2]).removeClass("bg-success");
+			$("#mcAnswer" + randomNumberArray[3]).removeClass("bg-success");
+			// TODO REMOVE THE ABOVE LINE - this is just for testing
+			console.log("correct answer: " + game.round.answer);
+			$("#mcAnswer" + randomNumberArray[0]).html(game.round.answer);
+			// TODO redo this where we can have more then 3x fake answers - more specifically, the assigned number of fake answers
+			// this allows us to handle both multiple guess and fill in the blank in the same function
+
 			console.log("looks like a multple choice question - we need fake answers");
 
 			// if (gameQuestions[Object.keys(gameQuestions)[randomNumber]].fakeAnswer1) {
@@ -378,6 +392,7 @@ $(document).ready(function() {
 			}
 			game.round.needsToBeGraded = true;
 			game.round.answerToBeGraded = "";
+			
 
 		}
 		else {
@@ -387,12 +402,16 @@ $(document).ready(function() {
 		delete gameQuestions[Object.keys(gameQuestions)[randomNumber]];
 		game.currentQuestion++;
 		game.roundInPlay = false;
+
+		game.gameTimer.start;
 	}
 
 	function cleanUpForNextQuestion() {
+
+		console.log("cleaning up");
 		// first we clean up
 		$("#question").empty();
-		game.round.needsToBeGraded = true;
+		game.round.needsToBeGraded = false;
 		game.round.answerToBeGraded = "";
 		game.round.correctAnswerStoredIn = "";
 
@@ -401,7 +420,7 @@ $(document).ready(function() {
 
 	function getNumberOfQuestionsRemaining() {
 		var numberOfQuestionsRemaining = Object.keys(gameQuestions).length;
-		console.log("Number of questions remaining: " + numberOfQuestionsRemaining);
+		console.log("Number of questions remaining in this entire deck: " + numberOfQuestionsRemaining);
 		return numberOfQuestionsRemaining;
 	}
 
@@ -459,4 +478,5 @@ $(document).ready(function() {
 		else {
 	    	form.addEventListener("submit", processForm);
 		}
+
 });

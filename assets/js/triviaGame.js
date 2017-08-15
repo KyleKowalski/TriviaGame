@@ -149,12 +149,13 @@ $(document).ready(function() {
 
 	var game = {};
 	var gameQuestions = {};
-	beginGame();
-	game.roundMaxTime = 5;
+	initializeGame();
+
+	//beginGame();
 
 
-
-	function setupGame() {
+	function initializeGame() {
+		// this is done before we start so users can modify it
 		game = {
 			numberOfQuestions:3,
 			currentQuestion:0,
@@ -271,21 +272,25 @@ $(document).ready(function() {
 				needTieBreaker:false // TODO add
 			}
 		}
+	}
 
+	function getQuestionsForGame() {
 			// TODO establish teams (screens and prompts)
-
 			// TODO select question types dynamically
-
 			// TODO select number of questions, timer, etc
-
 			gameQuestions = getAllQuestions(game.questionTypesSelected);
 				
 	}
 
 	function beginGame() {
-		setupGame();
+		getQuestionsForGame();
+		adjustUserVariables();
 		console.log("This will be a " + game.numberOfQuestions + " question long game.");
 		game.gameTimer.nextQuestion();
+	}
+
+	function adjustUserVariables() {
+		game.gameTimer.roundMaxTime = 30;
 	}
 
 	function getAllQuestions(typeOfQuestionArray) {
@@ -436,6 +441,7 @@ $(document).ready(function() {
 		game.round.needsToBeGraded = false;
 		game.round.answerToBeGraded = "";
 		game.round.correctAnswerStoredIn = "";
+		$("#displayTimeHere").html("Time Remaining: " + game.gameTimer.roundMaxTime);
 
 		// TODO more here
 	}
@@ -535,6 +541,12 @@ $(document).ready(function() {
 
 	$(".mc").click(function (event) {
 		checkMultipleChoiceAnswer(event.target.id);
+	});
+
+	$("#goButton").click(function () {
+		console.log("Go! button clicked")
+		$("#setupScreen").addClass("hidden");
+		beginGame();
 	});
 
 });

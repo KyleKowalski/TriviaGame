@@ -107,22 +107,22 @@ $(document).ready(function() {
 ////////////////////////////////////////// above block to be removed once we have the top block working ///////////////////////////////////////////	
 
 	// basic setup
-		// how many questions
+		// how many questions - DONE
 			// type of questions?
 				// multiple choice - DONE
 				// fill in the blank  TODO:  this is out of scope - DONE
-					// take everything to lower case to make this easier. string comparison?
+					// take everything to lower case to make this easier. string comparison? - DONE
 					// fuzzy string matching?  This would be HARD to do. - SKIP (for now - likely outside of scope)
 		// genre(s)? - DONE - handled in question setup
-		// time to answer (make this variable? ... why not? --- zero is infinite, otherwise use # of seconds)
-		// time after answer (make this variable? ... why not? --- zero is infinite, otherwise use # of seconds)
+		// time to answer (make this variable? ... why not? --- zero is infinite, otherwise use # of seconds) - DONE
+		// time after answer (make this variable? ... why not? --- zero is infinite, otherwise use # of seconds) - DONE
 
 	// TODO:  Advanced setup:  
 		// Setup Teams
 		// Option to only get one question before rotating - GOING WITH THIS METHOD (other is boring for other teams)
 
 	// TODO:  Pause button (longer games will need it - throw up a splash screen so that the game is not visible?)
-		// limit to 3x pauses or what not?
+		// limit to 3x pauses or what not? - SKIP (probably) - doable, just makes the game mechanic weird
 
 	// load questions based on above criteria
 	
@@ -139,7 +139,7 @@ $(document).ready(function() {
 
 	// dynamically build answers - DONE
 
-	// on click user answers or timeout - MC NO - FITB DONE
+	// on click user answers or timeout - DONE
 
 	// correct or incorrect or timeout counters go up
 
@@ -201,14 +201,14 @@ $(document).ready(function() {
     				game.gameTimer.clockRunning = false;
 				},
 				count: function() {
-					console.log("COUNT: initial call "  + game.gameTimer.timer + " clock running is: " + game.gameTimer.clockRunning + " paused: " + game.gameTimer.pause);
-					console.log("Just because: " + game.currentQuestion);
+					console.log("COUNT: call using: "  + game.gameTimer.timer + " clock running is: " + game.gameTimer.clockRunning + " paused: " + game.gameTimer.pause);
+					// console.log("Just because: " + game.currentQuestion);
 
 					if (game.gameTimer.pause) {
 						console.log("game is paused for something...?");
 					}
 					else if (!game.gameTimer.pause) {
-						console.log("game is not paused - continuing");
+						// console.log("game is not paused - continuing");
 						$("#scoreScreen").addClass("hidden");
 					
 						if ((game.gameTimer.timer <= game.roundMaxTime) && (game.gameTimer.timer > 0)) {
@@ -261,14 +261,16 @@ $(document).ready(function() {
 				members:"Kyle", // TODO add
 				correctAnswers:0, // TODO add
 				incorrectAnswers:0, // TODO add
+				noAnswer:0, // TODO add
 				needTieBreaker:false // TODO add
 			},
 			
-			team2: {// TODO dynamically create me 
+			team2: { // TODO dynamically create me 
 				teamName:"Team Bot", // TODO add
 				members:"Robot", // TODO add
 				correctAnswers:0, // TODO add
 				incorrectAnswers:0, // TODO add
+				noAnswer:0, // TODO add
 				needTieBreaker:false // TODO add
 			}
 		}
@@ -309,6 +311,7 @@ $(document).ready(function() {
 			if (game.round.answer.toLowerCase() === game.round.answerToBeGraded.toLowerCase()) {
 				console.log("*****AMAZING!!!!  The answer was EXACTLY right! ***** (this will almost NEVER happen)");
 				// TODO add correct answer ++
+				$("#gradingScreen").addClass("hidden");
 			}
 			else {
 				console.log("Manual grading required!");
@@ -320,6 +323,7 @@ $(document).ready(function() {
 		}
 		else {
 			console.log("They didn't try very hard - answer was blank - it is WRONG");
+			$("#gradingScreen").addClass("hidden");
 		}
 		//game.round.needsToBeGraded = false; // and we're done grading so we clear that out
 	}
@@ -350,7 +354,7 @@ $(document).ready(function() {
 		}
 		var randomNumber = Math.floor(Math.random() * numberOfQuestionsRemaining);
 		game.round.question = gameQuestions[Object.keys(gameQuestions)[randomNumber]].question;
-		console.log("question: " + game.round.question);
+		//console.log("question: " + game.round.question);
 		$("#question").html("<h1>" + game.round.question + "</h1>");
 		game.round.answer = gameQuestions[Object.keys(gameQuestions)[randomNumber]].answer;
 
@@ -367,22 +371,22 @@ $(document).ready(function() {
 			$("#mcAnswer" + randomNumberArray[2]).removeClass("bg-success");
 			$("#mcAnswer" + randomNumberArray[3]).removeClass("bg-success");
 			// TODO REMOVE THE ABOVE LINES - this is just for testing
-			console.log("correct answer: " + game.round.answer);
+			//console.log("correct answer: " + game.round.answer);
 			$("#mcAnswer" + randomNumberArray[0]).html(game.round.answer);
 			// TODO redo this where we can have more then 3x fake answers - more specifically, the assigned number of fake answers
 			// this allows us to handle both multiple guess and fill in the blank in the same function
 
-			console.log("looks like a multple choice question - we need fake answers");
+			//console.log("looks like a multple choice question - we need fake answers");
 
 			// if (gameQuestions[Object.keys(gameQuestions)[randomNumber]].fakeAnswer1) {
 			game.round.fakeAnswer1 = gameQuestions[Object.keys(gameQuestions)[randomNumber]].fakeAnswer1;
-			console.log("fake answer1: " + game.round.fakeAnswer1);
+			//console.log("fake answer1: " + game.round.fakeAnswer1);
 			$("#mcAnswer" + randomNumberArray[1]).html(game.round.fakeAnswer1);
 			game.round.fakeAnswer2 = gameQuestions[Object.keys(gameQuestions)[randomNumber]].fakeAnswer2
-			console.log("fake answer2: " + game.round.fakeAnswer2);
+			//console.log("fake answer2: " + game.round.fakeAnswer2);
 			$("#mcAnswer" + randomNumberArray[2]).html(game.round.fakeAnswer2);
 			game.round.fakeAnswer3 = gameQuestions[Object.keys(gameQuestions)[randomNumber]].fakeAnswer3;
-			console.log("fake answer3: " + game.round.fakeAnswer3);
+			// console.log("fake answer3: " + game.round.fakeAnswer3);
 			$("#mcAnswer" + randomNumberArray[3]).html(game.round.fakeAnswer3);
 
 			$("#fitb").addClass("hidden");
@@ -391,7 +395,7 @@ $(document).ready(function() {
 
 		}
 		else if (gameQuestions[Object.keys(gameQuestions)[randomNumber]].type === "fitb") {
-			console.log("looks like a fill in the blank, we need to add blanks")
+			// console.log("looks like a fill in the blank, we need to add blanks")
 			game.round.showBlanks = gameQuestions[Object.keys(gameQuestions)[randomNumber]].showBlanks;
 			var targetParent = $("#fitb")
 			targetParent.empty();
@@ -400,7 +404,7 @@ $(document).ready(function() {
 			$(".mc").addClass("hidden");
 
 			for (var i = 1; i <= game.round.showBlanks; i++) {
-				console.log("show: " + i);
+				//console.log("show: " + i);
 				var newRow = document.createElement("row");
 				var newDiv = document.createElement("div");
 				var newInput = document.createElement("input");
@@ -459,12 +463,12 @@ $(document).ready(function() {
 	function createAndShuffleRandomNumberArray(number) {
 		var returnArray = [];
 		for (var i = 1; i <= number; i++){
-			console.log("numbers to array: " + i)
+			//console.log("numbers to array: " + i)
 			returnArray.push(i);
 		}
-		console.log("Unsorted array: " + returnArray);
+		//console.log("Unsorted array: " + returnArray);
 		shuffle(returnArray);
-		console.log("Shuffled array: " + returnArray);
+		//console.log("Shuffled array: " + returnArray);
 		return returnArray;
 	}
 
@@ -490,14 +494,14 @@ $(document).ready(function() {
     if (e.preventDefault) e.preventDefault();    
 
     	for (var i = 1; i <= game.round.showBlanks; i++) {
-			console.log("getting value " + i + " from page: " + $("#answer" + i).val());
+			//console.log("getting value " + i + " from page: " + $("#answer" + i).val());
 			game.round.answerToBeGraded += $("#answer" + i).val();
 			if (game.round.showBlanks > 1 && i != game.round.showBlanks && $("#answer" + i).val() != "") {
 				game.round.answerToBeGraded += ", ";
 			}
 		}
-		console.log("final answer: >" + game.round.answerToBeGraded + "<");
-		console.log("stopping clock with " + game.gameTimer.timer + " seconds remaining");
+		// console.log("final answer: >" + game.round.answerToBeGraded + "<");
+		// console.log("stopping clock with " + game.gameTimer.timer + " seconds remaining");
 		$("#scoreScreen").removeClass("hidden");
 		game.gameTimer.pause = true;
 		game.gameTimer.timer = 0;
@@ -519,23 +523,27 @@ $(document).ready(function() {
 	function processSetupSubmit(e) { // nabbed from: https://stackoverflow.com/questions/5384712/capture-a-form-submit-in-javascript
     if (e.preventDefault) e.preventDefault();
 
-    	console.log("request recieved to process the setup form");
-
-  		game.numberOfTeams = $("#numberOfTeams").val()
+    	//console.log("request recieved to process the setup form");
+    	if ($("#numberOfTeams").val() != "") {
+  			game.numberOfTeams = $("#numberOfTeams").val();
+		}
   		game.numberOfQuestions = $("#numberOfQuestionsId").val();
   		game.roundMaxTime = $("#lengthOfRoundId").val();
 
-  		if (game.numberOfTeams === 1 || game.numberOfTeams === 0) {
-  			console.log("just one team eh?  Let's go");
+  		// console.log("teams: >" + game.numberOfTeams + "<");
+
+  		if (game.numberOfTeams == 1 || game.numberOfTeams === 0) {
+  			// console.log("just one team eh?  Let's go");
   			$("#setupScreen").addClass("hidden");
 			beginGame();
   		}
   		else {
-  			console.log("More then 1 team selected... we do something here")
+  			console.log("More then 1 team selected... we do something here");
+
   		}
 
-		$("#setupScreen").addClass("hidden");
-		beginGame();
+		// $("#setupScreen").addClass("hidden");
+		// beginGame();
     	
     	return false;
 	}
@@ -549,8 +557,8 @@ $(document).ready(function() {
 		}
 
 	$("#scoreScreen").click(function () {
-		console.log("request received to dismiss score screen and continue");
-		console.log("validating... current question num: " + game.currentQuestion + " >= " + game.numberOfQuestions + "?  if no, keep going")
+		// console.log("request received to dismiss score screen and continue");
+		// console.log("validating... current question num: " + game.currentQuestion + " >= " + game.numberOfQuestions + "?  if no, keep going")
 		$(".displayRoundHere").html("Round " + game.currentQuestion + " of " + game.numberOfQuestions);
 
 		if (game.currentQuestion >= game.numberOfQuestions) {
@@ -559,13 +567,13 @@ $(document).ready(function() {
 			game.gameTimer.stop();	
 		}
 		else if (game.round.needsToBeGraded) {
-			console.log("at score screen - we need to do some grading");
+			// console.log("at score screen - we need to do some grading");
 			$("#scoreScreen").addClass("hidden");
 			$("#gradingScreen").removeClass("hidden");
 			game.gameTimer.nextQuestion();
 		}
 		else {			
-			console.log("Click to continue:  Ok");
+			// console.log("Click to continue:  Ok");
 			game.gameTimer.pause = false;
 			game.gameTimer.nextQuestion();
 			$("#scoreScreen").addClass("hidden"); // TODO move this to a more appropriate space
@@ -592,14 +600,14 @@ $(document).ready(function() {
 
 	$("#correctAnswerButton").click(function () {
 		// TODO add to correct total
-		console.log("The grader said:  answer was CORRECT")
+		// console.log("The grader said:  answer was CORRECT")
 		$("#gradingScreen").addClass("hidden");
 		game.gameTimer.pause = false;
 	});
 
 	$("#wrongAnswerButton").click(function () {
 		// TODO add to wrong total
-		console.log("The grader said:  nope, incorrect");
+		// console.log("The grader said:  nope, incorrect");
 		$("#gradingScreen").addClass("hidden");
 		game.gameTimer.pause = false;
 	});

@@ -126,7 +126,7 @@ $(document).ready(function() {
 
 	// load questions based on above criteria
 	
-	// TODO this will be in some kind of loop
+	// TODO this will be in some kind of loop - DONE
 	
 	
 	
@@ -163,8 +163,7 @@ $(document).ready(function() {
 									geographyQuestionsMultipleChoice,
 									generalQuestionsFillInTheBlank,
 									geographyQuestionsFillInTheBlank],
-			roundMaxTime:30, // TODO assume seconds - 0 is 'infinite', otherwise just seconds
-			// roundInPlay:true, // TODO do I need this? 
+			roundMaxTime:30, // assume seconds - no infinite, but give users ability to set at 'high' (nearly unlimited) number
 			round: {
 				question:"",
 				answer:"",
@@ -208,7 +207,7 @@ $(document).ready(function() {
 						$("#scoreScreen").removeClass("hidden");
 					}
 					else if (!game.gameTimer.pause) {
-						console.log("game is unpaused - continuing");
+						console.log("game is not paused - continuing");
 						$("#scoreScreen").addClass("hidden");
 					
 						if ((game.gameTimer.timer <= game.roundMaxTime) && (game.gameTimer.timer > 0)) {
@@ -234,24 +233,10 @@ $(document).ready(function() {
   				resetClock: function() {
   					game.gameTimer.timer = game.roundMaxTime;
   				},
-  				displayScoreScreen: function () {
-					$("#scoreScreen").removeClass("hidden");
-
-  					if (game.currentQuestion <= game.numberOfQuestions) {
-  						console.log("Display Score Screen:  We have asked " + game.currentQuestion + " questions out of: " + game.numberOfQuestions);
-  						
-  						console.log("pausing for a few moments to observe the score");
-  						game.gameTimer.pause = true;
-  					}
-  					else {
-  						console.log("display score will stay lit, no more questions to ask")
-  					}
-  				},
   				nextQuestion: function() {
   					game.gameTimer.stop();
   					game.currentQuestion++;
   					getOneRandomQuestionAndRemoveItFromPool();
-
   					game.gameTimer.start();
   				},
 				timeConverter: function (t) { 
@@ -269,24 +254,23 @@ $(document).ready(function() {
 				    return minutes + ":" + seconds;
   				}
   			},
-			
 
-				team1: { // TODO dynamically create me
-					teamName:"Team Human", // TODO add
-					members:"Kyle", // TODO add
-					correctAnswers:0, // TODO add
-					incorrectAnswers:0, // TODO add
-					needTieBreaker:false // TODO add
-				},
-				
-				team2: {// TODO dynamically create me 
-					teamName:"Team Bot", // TODO add
-					members:"Robot", // TODO add
-					correctAnswers:0, // TODO add
-					incorrectAnswers:0, // TODO add
-					needTieBreaker:false // TODO add
-				}
+			team1: { // TODO dynamically create me
+				teamName:"Team Human", // TODO add
+				members:"Kyle", // TODO add
+				correctAnswers:0, // TODO add
+				incorrectAnswers:0, // TODO add
+				needTieBreaker:false // TODO add
+			},
+			
+			team2: {// TODO dynamically create me 
+				teamName:"Team Bot", // TODO add
+				members:"Robot", // TODO add
+				correctAnswers:0, // TODO add
+				incorrectAnswers:0, // TODO add
+				needTieBreaker:false // TODO add
 			}
+		}
 
 			// TODO establish teams (screens and prompts)
 
@@ -325,7 +309,8 @@ $(document).ready(function() {
 			console.log("Yikes!  We should grade their answer before getting our own question!");
 			// TODO Add grading stuff here
 			if (game.round.answerToBeGraded !== "") {
-				alert("previous question needs to be graded... question: " + game.round.question + " answer:" + game.round.answerToBeGraded);
+				// alert("previous question needs to be graded... question: " + game.round.question + " real answer: " + game.round.answer + " user answer:" + game.round.answerToBeGraded);
+				console.log("For Grading: " + game.round.answer.toLowerCase() + " VS " + game.round.answerToBeGraded.toLowerCase())
 				if (game.round.answer.toLowerCase() === game.round.answerToBeGraded.toLowerCase()) {
 					console.log("*****AMAZING!!!!  The answer was EXACTLY right! ***** (this will almost NEVER happen)");
 				}
@@ -365,14 +350,14 @@ $(document).ready(function() {
 			var randomNumberArray = createAndShuffleRandomNumberArray(4); // TODO this should be the length of the answers, not hard coded
 
 			//game.round.answer = gameQuestions[Object.keys(gameQuestions)[randomNumber]].answer;
-			game.round.correctAnswerStoredIn = "#mcAnswer" + randomNumberArray[0];
+			game.round.correctAnswerStoredIn = "mcAnswer" + randomNumberArray[0];
 
-			// TODO REMOVE THE FOLLOWING LINE - this is just for testing
+			// TODO REMOVE THE FOLLOWING LINES - this is just for testing
 			$("#mcAnswer" + randomNumberArray[0]).addClass("bg-success");
 			$("#mcAnswer" + randomNumberArray[1]).removeClass("bg-success");
 			$("#mcAnswer" + randomNumberArray[2]).removeClass("bg-success");
 			$("#mcAnswer" + randomNumberArray[3]).removeClass("bg-success");
-			// TODO REMOVE THE ABOVE LINE - this is just for testing
+			// TODO REMOVE THE ABOVE LINES - this is just for testing
 			console.log("correct answer: " + game.round.answer);
 			$("#mcAnswer" + randomNumberArray[0]).html(game.round.answer);
 			// TODO redo this where we can have more then 3x fake answers - more specifically, the assigned number of fake answers
@@ -392,7 +377,7 @@ $(document).ready(function() {
 			$("#mcAnswer" + randomNumberArray[3]).html(game.round.fakeAnswer3);
 
 			$("#fitb").addClass("hidden");
-			$("#fitb-submit").addClass("hidden");
+			$(".fitb-submit").addClass("hidden");
 			$(".mc").removeClass("hidden");
 
 		}
@@ -402,7 +387,7 @@ $(document).ready(function() {
 			var targetParent = $("#fitb")
 			targetParent.empty();
 			targetParent.removeClass("hidden");
-			$("#fitb-submit").removeClass("hidden");
+			$(".fitb-submit").removeClass("hidden");
 			$(".mc").addClass("hidden");
 
 			for (var i = 1; i <= game.round.showBlanks; i++) {
@@ -428,6 +413,20 @@ $(document).ready(function() {
 		delete gameQuestions[Object.keys(gameQuestions)[randomNumber]];
 		$(".displayRoundHere").html("Round " + game.currentQuestion + " of " + game.numberOfQuestions);
 
+	}
+
+	function checkMultipleChoiceAnswer(clickedId) {
+		console.log("MC answer is: >" + clickedId + "< correct answer is: >" + game.round.correctAnswerStoredIn + "<");
+		if (game.round.correctAnswerStoredIn == clickedId) {
+			console.log("looks like we have the correct answer!");
+			// TODO add the 'we win' logic - correct answer ++
+		}
+		else {
+			console.log("MC answer is incorrect: " + clickedId);
+			// TODO add the 'we lose' logic - incorrect answer ++
+		}
+		game.gameTimer.pause = true;
+		game.gameTimer.timer = 0;
 	}
 
 	function cleanUpForNextQuestion() {
@@ -483,11 +482,11 @@ $(document).ready(function() {
     	for (var i = 1; i <= game.round.showBlanks; i++) {
 			console.log("getting value " + i + " from page: " + $("#answer" + i).val());
 			game.round.answerToBeGraded += $("#answer" + i).val();
-			if (game.round.showBlanks > 1 && i != game.round.showBlanks) {
+			if (game.round.showBlanks > 1 && i != game.round.showBlanks && $("#answer" + i).val() != "") {
 				game.round.answerToBeGraded += ", ";
 			}
 		}
-		console.log("final answer: " + game.round.answerToBeGraded);
+		console.log("final answer: >" + game.round.answerToBeGraded + "<");
 		console.log("stopping clock with " + game.gameTimer.timer + " seconds remaining")
 		game.gameTimer.pause = true;
 		game.gameTimer.timer = 0;
@@ -510,16 +509,32 @@ $(document).ready(function() {
 
 		if (game.currentQuestion >= game.numberOfQuestions) {
 			console.log("Click to continue:  No, game is over!");
-			game.gameTimer.stop();
-			//$("#scoreScreen").removeClass("hidden");
-			
+			$(".gameOver").removeClass("hidden");	
+			game.gameTimer.stop();	
 		}
 		else {			
 			console.log("Click to continue:  Ok");
 			game.gameTimer.pause = false;
 			game.gameTimer.nextQuestion();
-			$("#scoreScreen").addClass("hidden");
+			$("#scoreScreen").addClass("hidden"); // TODO move this to a more appropriate space
 		}
+	});
+
+	$("#newGameSamePeople").click(function () {
+		// TODO something here
+	});
+
+	$("#newGameDifferentPeople").click(function () {
+		// TODO something here
+	});
+
+	$("#stopHere").click(function () {
+		game.gameTimer.stop();
+		console.log("global stop for testing purposes - will be removed later")
+	});
+
+	$(".mc").click(function (event) {
+		checkMultipleChoiceAnswer(event.target.id);
 	});
 
 });

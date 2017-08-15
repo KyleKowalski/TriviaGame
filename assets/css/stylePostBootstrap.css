@@ -11,12 +11,8 @@ body {
 	/*color:rgba(255, 255, 255, 1);*/
 }
 
-/*img {
-	float:left;
-}*/
-
-.height100 {
-	min-height:100%;
+.fitb-submit-row {
+	clear:both;
 }
 
 .relative {
@@ -35,20 +31,6 @@ body {
 	padding:0;
 	z-index:1;
 	background-color:black;
-	background-size: 100% 100%;
-	background-repeat: no-repeat;
-	color:white;
-	width:90%;
-	height:90%;
-}
-
-.absoluteForImage {
-	position:absolute;
-	top:5%;
-	left:5%;
-	vertical-align: middle;
-	padding:0;
-	z-index:1;
 	background-size: 100% 100%;
 	background-repeat: no-repeat;
 	color:white;

@@ -15,6 +15,7 @@
 
 </head>
 <body>
+	<button id="stopHere" class="very-very-temporary-for-testing form-control">Stop.  Testing Time.</button>
 	<container class="text-center">
 		<row>
 			<div id="title" class="">
@@ -28,53 +29,49 @@
 				<h1 id="displayTimeHere" class="col-xs-6 col-sm-6 col-md-6 col-lg-6">Time Remaining:</h1>
 			</row>
 			<row>
-				<div>
+	<!-- 			<div> -->
 					<h2 class="col-xs-12 col-sm-12 col-md-12 col-lg-12">Question: </h2>
 					<div id="question" class="col-xs-12 col-sm-12 col-md-12 col-lg-12"></div>
-				</div>
+				<!-- </div> -->
 			</row>
 			<row>
-				<div>
+				<!-- <div> -->
 					<h3 class="col-xs-12 col-sm-12 col-md-12 col-lg-12">Possible Answer(s):</h3>
-				</div>
+				<!-- </div> -->
 			</row>
-				<form id="fitb-form">
-				<row>
-					<div id="fitb" class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-					</div>
-				</row>
-				<row>
-					<div class="empty col-xs-4 col-sm-4 col-md-4 col-lg-4"></div>
-					<div id="fitb-submit" class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-						<button type="submit" class="form-control">Submit Answers</button>
-					</div>
-					<div class="empty col-xs-4 col-sm-4 col-md-4 col-lg-4"></div>
-				</row>
-				</form>
-			<row class="mc" class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-				<div>
-					<h2><div id="mcAnswer1"></div></h2>
-				</div>
+			<row>
+				 <form id="fitb-form">
+					<row>
+						<div id="fitb" class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+						</div>
+					</row>
+					<row class="fitb-submit-row">
+						<div class="empty fitb-submit col-xs-4 col-sm-4 col-md-4 col-lg-4"></div>
+						<div class="fitb-submit col-xs-4 col-sm-4 col-md-4 col-lg-4">
+							<button type="submit" class="form-control">Submit Answers</button>
+						</div>
+						<div class="empty fitb-submit col-xs-4 col-sm-4 col-md-4 col-lg-4"></div>
+					</row>
+				 </form>
 			</row>
 			<row class="mc" class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-				<div>
-					<h2><div id="mcAnswer2"></div></h2>
-				</div>
+					<h2 id="mcAnswer1"></h2>
 			</row>
 			<row class="mc" class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-				<div>
-					<h2><div id="mcAnswer3"></div></h2>
-				</div>
+					<h2 id="mcAnswer2"></h2>
+			</row>
+			<row class="mc" class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+					<h2 id="mcAnswer3"></h2>
 			</row>
 			<row class="mc" class="col-xs-12 col-sm-12 col-md-12 col-lg-12"> 
-				<div>
-					<h2><div id="mcAnswer4"></div></h2>
-				</div>
+					<h2 id="mcAnswer4"></h2>
 			</row>
 	</container>
 	<div id="scoreScreen" class="hidden absolute text-center">
 		<div>The score is here! (click to contine)</div>
 		<div class="displayRoundHere"></div>
+		<button type="button" id="newGameSamePeople" class="gameOver hidden form-control">Click Here To Start A New Game With The Same Questions/Teams</button>
+		<button type="button" id="newGameDifferentPeople" class="gameOver hidden form-control">Click Here To Start Entirely Over (new questions/teams)</button>
 	</div>
 </body>
 </html>

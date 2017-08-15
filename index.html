@@ -29,7 +29,7 @@
 		<row><h5>It shares a single screen... for now. (future updates, etc, as time permits)</h5></row>
 		<row><h5>Please create your team(s) - many people on a single team?  Sure!</h5></row>
 		<row><h5>Then select the type of questions to be asked.</h5></row>
-		<row><h5>There are a few other variables to choose (timer length, etc)</h5></row>
+		<row><h5>There are a few other variables to choose (number of questions, timer length, etc)</h5></row>
 		<row><h5>Multiple choice will auto grade.</h5></row>
 		<row><h5>Fill in the blank will be graded by the next team (or yourself if 1 team - honor system, please?)</h5></row>
 		<row><h5>When you're ready - click 'Go!'</h5></row>
@@ -52,6 +52,19 @@
 				<div class="empty col-xs-4 col-sm-4 col-md-4 col-lg-4"></div>
 			</row>
 		</form>
+	</container>
+	<container id="gradingScreen" class="hidden absolute text-center">
+		<row><h1>Previous Question Requires Grading!</h1></row>
+		<row><h3>Previous Question:</h3></row>
+		<row><h4 id="previousQuestionHere"></h4 ></row>
+		<row><h3>Correct Answer:</h3></row>
+		<row><h4 id="previousAnswerHere"></h4></row>
+		<row><h3>Proposed Answer:</h3></row>
+		<row><h4 id="answerToBeGradedHere"></h4></row>
+		<hr>
+		<row><button id="correctAnswerButton" class="form-control">Correct!</button></row>
+		<row><button id="wrongAnswerButton" class="form-control">Nope!  Sorry, incorrect</button></row>
+
 	</container>
 	<container id="" class="text-center">
 			<row>
@@ -100,6 +113,7 @@
 	<div id="scoreScreen" class="hidden absolute text-center">
 		<div>The score is here! (click to contine)</div>
 		<div class="displayRoundHere"></div>
+		<h1>Team (some team here) Turn!</h1>
 		<button type="button" id="newGameSamePeople" class="gameOver hidden form-control">Click Here To Start A New Game With The Same Questions/Teams</button>
 		<button type="button" id="newGameDifferentPeople" class="gameOver hidden form-control">Click Here To Start Entirely Over (new questions/teams)</button>
 	</div>

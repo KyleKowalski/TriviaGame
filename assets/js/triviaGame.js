@@ -206,7 +206,6 @@ $(document).ready(function() {
 
 					if (game.gameTimer.pause) {
 						console.log("game is paused for something...?");
-						$("#scoreScreen").removeClass("hidden");
 					}
 					else if (!game.gameTimer.pause) {
 						console.log("game is not paused - continuing");
@@ -303,25 +302,34 @@ $(document).ready(function() {
 		return questionObject;
 	}
 
+	function gradingRequired() {
+		// TODO Add grading stuff here
+		if (game.round.answerToBeGraded !== "") {
+			console.log("For Grading: " + game.round.answer.toLowerCase() + " VS " + game.round.answerToBeGraded.toLowerCase())
+			if (game.round.answer.toLowerCase() === game.round.answerToBeGraded.toLowerCase()) {
+				console.log("*****AMAZING!!!!  The answer was EXACTLY right! ***** (this will almost NEVER happen)");
+				// TODO add correct answer ++
+			}
+			else {
+				console.log("Manual grading required!");
+				$("#previousQuestionHere").html(game.round.question);
+				$("#previousAnswerHere").html(game.round.answer);
+				$("#answerToBeGradedHere").html(game.round.answerToBeGraded);
+				
+			}  
+		}
+		else {
+			console.log("They didn't try very hard - answer was blank - it is WRONG");
+		}
+		//game.round.needsToBeGraded = false; // and we're done grading so we clear that out
+	}
+
 	function getOneRandomQuestionAndRemoveItFromPool() {
 		console.log("===== We're in get one question from pool: =====");
 
 		if (game.round.needsToBeGraded) {
-			console.log("Yikes!  We should grade their answer before getting our own question!");
-			// TODO Add grading stuff here
-			if (game.round.answerToBeGraded !== "") {
-				// alert("previous question needs to be graded... question: " + game.round.question + " real answer: " + game.round.answer + " user answer:" + game.round.answerToBeGraded);
-				console.log("For Grading: " + game.round.answer.toLowerCase() + " VS " + game.round.answerToBeGraded.toLowerCase())
-				if (game.round.answer.toLowerCase() === game.round.answerToBeGraded.toLowerCase()) {
-					console.log("*****AMAZING!!!!  The answer was EXACTLY right! ***** (this will almost NEVER happen)");
-				}
-				// TODO more stuff here - how do we grade and what happens.  
-			}
-			else {
-				console.log("They didn't try very hard - answer was blank - it is WRONG");
-			}
-			game.round.needsToBeGraded = false; // and we're done grading so we clear that out
-			console.log("finished grading, on to next question");
+			console.log("Yikes!  We should grade the previous answer before getting our own question!");
+			gradingRequired();
 		}
 		
 		cleanUpForNextQuestion();
@@ -439,7 +447,7 @@ $(document).ready(function() {
 		game.round.correctAnswerStoredIn = "";
 		$("#displayTimeHere").html("Time Remaining: " + game.roundMaxTime);
 
-		// TODO more here
+		// TODO more here?
 	}
 
 	function getNumberOfQuestionsRemaining() {
@@ -489,12 +497,13 @@ $(document).ready(function() {
 			}
 		}
 		console.log("final answer: >" + game.round.answerToBeGraded + "<");
-		console.log("stopping clock with " + game.gameTimer.timer + " seconds remaining")
+		console.log("stopping clock with " + game.gameTimer.timer + " seconds remaining");
+		$("#scoreScreen").removeClass("hidden");
 		game.gameTimer.pause = true;
 		game.gameTimer.timer = 0;
 
 		// TODO get the focus off the submit element (which is behind the screen that is visible)
-		//$("#scoreScreen").focus(); // TODO get the focus off the submit button (which is behind this screen)
+		//$("#scoreScreen").focus(); // this isn't working as I'd like
 
     	return false;
 	}
@@ -539,17 +548,21 @@ $(document).ready(function() {
 	    	form.addEventListener("submit", processSetupSubmit);
 		}
 
-
-
 	$("#scoreScreen").click(function () {
 		console.log("request received to dismiss score screen and continue");
-		console.log("validating... current question num: " + game.currentQuestion + " >= " + game.numberOfQuestions + "?  if yes, keep going")
+		console.log("validating... current question num: " + game.currentQuestion + " >= " + game.numberOfQuestions + "?  if no, keep going")
 		$(".displayRoundHere").html("Round " + game.currentQuestion + " of " + game.numberOfQuestions);
 
 		if (game.currentQuestion >= game.numberOfQuestions) {
 			console.log("Click to continue:  No, game is over!");
 			$(".gameOver").removeClass("hidden");	
 			game.gameTimer.stop();	
+		}
+		else if (game.round.needsToBeGraded) {
+			console.log("at score screen - we need to do some grading");
+			$("#scoreScreen").addClass("hidden");
+			$("#gradingScreen").removeClass("hidden");
+			game.gameTimer.nextQuestion();
 		}
 		else {			
 			console.log("Click to continue:  Ok");
@@ -574,12 +587,21 @@ $(document).ready(function() {
 
 	$(".mc").click(function (event) {
 		checkMultipleChoiceAnswer(event.target.id);
+		$("#scoreScreen").removeClass("hidden");
 	});
 
-	// $("#goButton").click(function () {
-	// 	console.log("Go! button clicked")
-	// 	$("#setupScreen").addClass("hidden");
-	// 	beginGame();
-	// });
+	$("#correctAnswerButton").click(function () {
+		// TODO add to correct total
+		console.log("The grader said:  answer was CORRECT")
+		$("#gradingScreen").addClass("hidden");
+		game.gameTimer.pause = false;
+	});
+
+	$("#wrongAnswerButton").click(function () {
+		// TODO add to wrong total
+		console.log("The grader said:  nope, incorrect");
+		$("#gradingScreen").addClass("hidden");
+		game.gameTimer.pause = false;
+	});
 
 });

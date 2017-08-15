@@ -104,6 +104,11 @@ $(document).ready(function() {
 		}
 	}
 
+	var availableQuestionsArray = ["generalQuestionsMultipleChoice",
+									"generalQuestionsFillInTheBlank",
+									"geographyQuestionsMultipleChoice",
+									"geographyQuestionsFillInTheBlank"]
+
 ////////////////////////////////////////// above block to be removed once we have the top block working ///////////////////////////////////////////	
 
 	// basic setup
@@ -150,9 +155,8 @@ $(document).ready(function() {
 	var game = {};
 	var gameQuestions = {};
 	initializeGame();
-
-	//beginGame();
-
+	
+	// createCheckboxArrayForQuestionTypes()
 
 	function initializeGame() {
 		// this is done before we start so users can modify it
@@ -274,6 +278,7 @@ $(document).ready(function() {
 				needTieBreaker:false // TODO add
 			}
 		}
+		createCheckboxArrayForQuestionTypes();
 	}
 
 	function getQuestionsForGame() {
@@ -304,6 +309,26 @@ $(document).ready(function() {
 		return questionObject;
 	}
 
+	function createCheckboxArrayForQuestionTypes () {
+		targetParent = $("#checkboxArrayForQuestionTypesHere");
+		targetParent.empty();
+		availableQuestionsArray.forEach(function(item){
+			
+			var newRow = document.createElement("row");
+			var newDiv = document.createElement("div");
+			var newInput = document.createElement("input");
+			newInput.type = "checkbox";
+			newInput.name = "questionCheckbox";
+			newInput.id = item;
+			newInput.html = item;
+			targetParent.append(newRow);
+			newRow.append(newDiv);
+			newDiv.append(newInput);
+			newInput.setAttribute("class", "form-control");
+			console.log("adding this array item: " + item);
+		});
+	}
+
 	function gradingRequired() {
 		// TODO Add grading stuff here
 		if (game.round.answerToBeGraded !== "") {
@@ -325,7 +350,6 @@ $(document).ready(function() {
 			console.log("They didn't try very hard - answer was blank - it is WRONG");
 			$("#gradingScreen").addClass("hidden");
 		}
-		//game.round.needsToBeGraded = false; // and we're done grading so we clear that out
 	}
 
 	function getOneRandomQuestionAndRemoveItFromPool() {

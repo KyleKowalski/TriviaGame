@@ -157,14 +157,15 @@ $(document).ready(function() {
 	function initializeGame() {
 		// this is done before we start so users can modify it
 		game = {
-			numberOfQuestions:3,
+			numberOfTeams:0,
+			numberOfQuestions:0,
 			currentQuestion:0,
 			outOfQuestions:false,
 			questionTypesSelected:[generalQuestionsMultipleChoice,
 									geographyQuestionsMultipleChoice,
 									generalQuestionsFillInTheBlank,
 									geographyQuestionsFillInTheBlank],
-			roundMaxTime:30, // assume seconds - no infinite, but give users ability to set at 'high' (nearly unlimited) number
+			roundMaxTime:0, // assume seconds - no infinite, but give users ability to set at 'high' (nearly unlimited) number
 			round: {
 				question:"",
 				answer:"",
@@ -284,13 +285,8 @@ $(document).ready(function() {
 
 	function beginGame() {
 		getQuestionsForGame();
-		adjustUserVariables();
 		console.log("This will be a " + game.numberOfQuestions + " question long game.");
 		game.gameTimer.nextQuestion();
-	}
-
-	function adjustUserVariables() {
-		game.gameTimer.roundMaxTime = 30;
 	}
 
 	function getAllQuestions(typeOfQuestionArray) {
@@ -441,7 +437,7 @@ $(document).ready(function() {
 		game.round.needsToBeGraded = false;
 		game.round.answerToBeGraded = "";
 		game.round.correctAnswerStoredIn = "";
-		$("#displayTimeHere").html("Time Remaining: " + game.gameTimer.roundMaxTime);
+		$("#displayTimeHere").html("Time Remaining: " + game.roundMaxTime);
 
 		// TODO more here
 	}
@@ -482,8 +478,8 @@ $(document).ready(function() {
   	return array;
 	}
 
-	function processForm(e) { // nabbed from: https://stackoverflow.com/questions/5384712/capture-a-form-submit-in-javascript
-    if (e.preventDefault) e.preventDefault();
+	function processAnswerSubmit(e) { // nabbed from: https://stackoverflow.com/questions/5384712/capture-a-form-submit-in-javascript
+    if (e.preventDefault) e.preventDefault();    
 
     	for (var i = 1; i <= game.round.showBlanks; i++) {
 			console.log("getting value " + i + " from page: " + $("#answer" + i).val());
@@ -497,16 +493,53 @@ $(document).ready(function() {
 		game.gameTimer.pause = true;
 		game.gameTimer.timer = 0;
 
+		// TODO get the focus off the submit element (which is behind the screen that is visible)
+		//$("#scoreScreen").focus(); // TODO get the focus off the submit button (which is behind this screen)
+
     	return false;
 	}
 
 	var form = document.getElementById('fitb-form'); // nabbed from: https://stackoverflow.com/questions/5384712/capture-a-form-submit-in-javascript
 		if (form.attachEvent) {
-    		form.attachEvent("submit", processForm);
+    		form.attachEvent("submit", processAnswerSubmit);
 		} 
 		else {
-	    	form.addEventListener("submit", processForm);
+	    	form.addEventListener("submit", processAnswerSubmit);
 		}
+
+	function processSetupSubmit(e) { // nabbed from: https://stackoverflow.com/questions/5384712/capture-a-form-submit-in-javascript
+    if (e.preventDefault) e.preventDefault();
+
+    	console.log("request recieved to process the setup form");
+
+  		game.numberOfTeams = $("#numberOfTeams").val()
+  		game.numberOfQuestions = $("#numberOfQuestionsId").val();
+  		game.roundMaxTime = $("#lengthOfRoundId").val();
+
+  		if (game.numberOfTeams === 1 || game.numberOfTeams === 0) {
+  			console.log("just one team eh?  Let's go");
+  			$("#setupScreen").addClass("hidden");
+			beginGame();
+  		}
+  		else {
+  			console.log("More then 1 team selected... we do something here")
+  		}
+
+		$("#setupScreen").addClass("hidden");
+		beginGame();
+    	
+    	return false;
+	}
+
+	var form = document.getElementById('setupForm'); // nabbed from: https://stackoverflow.com/questions/5384712/capture-a-form-submit-in-javascript
+		if (form.attachEvent) {
+    		form.attachEvent("submit", processSetupSubmit);
+		} 
+		else {
+	    	form.addEventListener("submit", processSetupSubmit);
+		}
+
+
 
 	$("#scoreScreen").click(function () {
 		console.log("request received to dismiss score screen and continue");
@@ -543,10 +576,10 @@ $(document).ready(function() {
 		checkMultipleChoiceAnswer(event.target.id);
 	});
 
-	$("#goButton").click(function () {
-		console.log("Go! button clicked")
-		$("#setupScreen").addClass("hidden");
-		beginGame();
-	});
+	// $("#goButton").click(function () {
+	// 	console.log("Go! button clicked")
+	// 	$("#setupScreen").addClass("hidden");
+	// 	beginGame();
+	// });
 
 });

@@ -104,10 +104,10 @@ $(document).ready(function() {
 		}
 	}
 
-	var availableQuestionsArray = ["generalQuestionsMultipleChoice",
-									"generalQuestionsFillInTheBlank",
-									"geographyQuestionsMultipleChoice",
-									"geographyQuestionsFillInTheBlank"]
+	var availableQuestionsArray = 	[["General Questions Multiple Choice",generalQuestionsMultipleChoice],
+									["General Questions Fill In The Blank",generalQuestionsFillInTheBlank],
+									["Geography Questions Multiple Choice",geographyQuestionsMultipleChoice],
+									["Geography Questions Fill In The Blank",geographyQuestionsFillInTheBlank]]
 
 ////////////////////////////////////////// above block to be removed once we have the top block working ///////////////////////////////////////////	
 
@@ -168,6 +168,7 @@ $(document).ready(function() {
 									geographyQuestionsFillInTheBlank],
 			roundMaxTime:0, // assume seconds - no infinite, but give users ability to set at 'high' (nearly unlimited) number
 			round: {
+				team:"",
 				question:"",
 				answer:"",
 				type:"",
@@ -329,14 +330,37 @@ $(document).ready(function() {
 			(document.createTextNode('text for label after checkbox'));
 			newInput.setAttribute("class", "form-control");
 			newInput.setAttribute("class", "big-checkbox");
-			// newInput.setAttribute("autocomplete", "off");
-			console.log("adding this array item: " + item);
+			//console.log("adding this array item: " + item);
 
 		});
 	}
 
+	function createTeams() {
+		console.log("Request received to create teams, this many: " + game.numberOfTeams);
+		$("#teamCreationScreen").removeClass("hidden"); // TODO move this?
+
+		for (var i = 1; i<= game.numberOfTeams; i++) {
+			var teamExists = false;
+			for (var key in game) {
+				console.log("looking for: team" + [i] + " got: " + key);
+				var thisTeam = "team" + [i];
+				if (key == thisTeam || teamExists == true) {
+					//console.log("Team exists - moving on");
+					teamExists = true;
+				}
+				else {
+					//console.log("team" + [i] + " does not exist");
+				}
+			}
+			if (!teamExists) {
+				console.log("*****Creating new team: team" + [i]);
+				$("#teamName").html("Team " + [i] + " Name:");
+				// TODO create and store team information here
+			}
+		}
+	}
+
 	function gradingRequired() {
-		// TODO Add grading stuff here
 		if (game.round.answerToBeGraded !== "") {
 			console.log("For Grading: " + game.round.answer.toLowerCase() + " VS " + game.round.answerToBeGraded.toLowerCase())
 			if (game.round.answer.toLowerCase() === game.round.answerToBeGraded.toLowerCase()) {
@@ -349,11 +373,11 @@ $(document).ready(function() {
 				$("#previousQuestionHere").html(game.round.question);
 				$("#previousAnswerHere").html(game.round.answer);
 				$("#answerToBeGradedHere").html(game.round.answerToBeGraded);
-				
 			}  
 		}
 		else {
 			console.log("They didn't try very hard - answer was blank - it is WRONG");
+			// TODO add answer wrong ++
 			$("#gradingScreen").addClass("hidden");
 		}
 	}
@@ -459,7 +483,7 @@ $(document).ready(function() {
 	}
 
 	function checkMultipleChoiceAnswer(clickedId) {
-		console.log("MC answer is: >" + clickedId + "< correct answer is: >" + game.round.correctAnswerStoredIn + "<");
+		//console.log("MC answer is: >" + clickedId + "< correct answer is: >" + game.round.correctAnswerStoredIn + "<");
 		if (game.round.correctAnswerStoredIn == clickedId) {
 			console.log("looks like we have the correct answer!");
 			// TODO add the 'we win' logic - correct answer ++
@@ -560,7 +584,7 @@ $(document).ready(function() {
   		game.numberOfQuestions = $("#numberOfQuestionsId").val();
   		game.roundMaxTime = $("#lengthOfRoundId").val();
 
-  		// console.log("teams: >" + game.numberOfTeams + "<");
+
 
   		if (game.numberOfTeams == 1 || game.numberOfTeams === 0) {
   			// console.log("just one team eh?  Let's go");
@@ -569,12 +593,8 @@ $(document).ready(function() {
   		}
   		else {
   			console.log("More then 1 team selected... we do something here");
-
+  			createTeams();
   		}
-
-		// $("#setupScreen").addClass("hidden");
-		// beginGame();
-    	
     	return false;
 	}
 

@@ -29,7 +29,7 @@
 		<row><h5>The basics:  This is a multi-round trivia for one to many teams.</h5></row>
 		<row><h5>It shares a single screen... for now. (future updates, etc, as time permits)</h5></row>
 		<row><h5>Please create your team(s) - many people on a single team?  Sure!</h5></row>
-		<row><h5>Then select the type of questions to be asked.</h5></row>
+		<row><h5>Then select the type of questions to be asked (checkboxes below).</h5></row>
 		<row><h5>There are a few other variables to choose (number of questions, timer length, etc)</h5></row>
 		<!-- <row><h5>Multiple choice will auto grade.</h5></row> -->
 		<row><h5>Fill in the blank will be graded by the next team (or yourself if 1 team - honor system, please?)</h5></row>
@@ -41,20 +41,33 @@
 			<hr>
 			<row><h4>Game Variables:</h4></row>
 			<row><h5 class="col-xs-6 col-sm-6 col-md-6 col-lg-6">Number of questions (per team):</h5></row>
-			<row><input id="numberOfQuestionsId" autocomplete="off" class=" col-xs-4 col-sm-4 col-md-4 col-lg-4" value="10"></row>
+			<row><input id="numberOfQuestionsId" autocomplete="off" class="col-xs-4 col-sm-4 col-md-4 col-lg-4" value="10"></row>
 			<!-- TODO re-add form control for these two elements-->
 			<row><h5 class="clear-both col-xs-6 col-sm-6 col-md-6 col-lg-6">Time limit for each question (seconds):</h5></row>
 			<row><input id="lengthOfRoundId" autocomplete="off" class="col-xs-4 col-sm-4 col-md-4 col-lg-4" value="30"></row>
 			<hr class="clear-both">
 			<row><h4 class="">Types Of Questions (work in progess)</h4></row>
-			<div id="checkboxArrayForQuestionTypesHere">
-				<div>blah blah blah</div>
-			</div>
+			<div id="checkboxArrayForQuestionTypesHere"></div>
 			<hr>
 			<row>
-				<div class="empty col-xs-4 col-sm-4 col-md-4 col-lg-4"></div>
-				<button id="goButton" type="submit" class="form-control col-xs-4 col-sm-4 col-md-4 col-lg-4">Go!</button>
-				<div class="empty col-xs-4 col-sm-4 col-md-4 col-lg-4"></div>
+				<!-- <div class="empty col-xs-4 col-sm-4 col-md-4 col-lg-4"></div> -->
+				<button id="goButton" type="submit" class="form-control">Go!</button>
+				<!-- <div class="empty col-xs-4 col-sm-4 col-md-4 col-lg-4"></div> -->
+			</row>
+		</form>
+	</container>
+	<container id="teamCreationScreen" class="hidden absoluteForTeams text-center">
+		<form id="teamCreationForm" class="form-inline">
+			<row><h1 id="teamName">Team Name:</h1></row>
+			<row><input id="teamName" autocomplete="off" placeholder="Enter your teams name here:" class="form-control"></row>
+			<hr>
+			<row><h1>Members:</h1></row>
+			<div id="teamMembersDiv"></div>
+			<hr>
+			<row><h3 id="clickToAddTeamMember">Click Here to add another team member!</h3></row>
+			<hr>
+			<row>
+				<button id="teamCreationButton" type="submit" class="form-control">Go!</button>			
 			</row>
 		</form>
 	</container>
@@ -69,23 +82,18 @@
 		<hr>
 		<row><button id="correctAnswerButton" class="form-control">Correct!</button></row>
 		<row><button id="wrongAnswerButton" class="form-control">Nope!  Sorry, incorrect</button></row>
-
 	</container>
-	<container id="" class="text-center">
+	<container id="mainPage" class="text-center">
 			<row>
 				<h1 id="displayRoundHere" class="displayRoundHere col-xs-6 col-sm-6 col-md-6 col-lg-6">Let's play Trivia!</h1>
 				<h1 id="displayTimeHere" class="col-xs-6 col-sm-6 col-md-6 col-lg-6">Time Remaining:</h1>
 			</row>
 			<row>
-	<!-- 			<div> -->
-					<h2 class="col-xs-12 col-sm-12 col-md-12 col-lg-12">Question: </h2>
-					<div id="question" class="col-xs-12 col-sm-12 col-md-12 col-lg-12"></div>
-				<!-- </div> -->
+				<h2 class="col-xs-12 col-sm-12 col-md-12 col-lg-12">Question: </h2>
+				<div id="question" class="col-xs-12 col-sm-12 col-md-12 col-lg-12"></div>>
 			</row>
 			<row>
-				<!-- <div> -->
-					<h3 class="col-xs-12 col-sm-12 col-md-12 col-lg-12">Possible Answer(s):</h3>
-				<!-- </div> -->
+				<h3 class="col-xs-12 col-sm-12 col-md-12 col-lg-12">Possible Answer(s):</h3>
 			</row>
 			<row>
 				 <form id="fitb-form">
@@ -116,9 +124,14 @@
 			</row>
 	</container>
 	<div id="scoreScreen" class="hidden absolute text-center">
-		<div>The score is here! (click to contine)</div>
-		<div class="displayRoundHere"></div>
-		<h1>Team (some team here) Turn!</h1>
+		<row><h1>Current Score:</h1></row>
+		<row><h3>(Click to continue)</h3></row>
+		<row><div id="currentScoreHere"></div></row>
+		<row><h3 class="displayRoundHere"></h3></row>
+		<row><h1 id="thisTeamsTurnHere">Team (some team here) Turn!</h1></row>
+		<row><h3 id="numberCorrectHere"></h3></row>
+		<row><h3 id="numberWrongHere"></h3></row>
+		<row><h3 id="numberNoAnswerHere"></h3></row>
 		<button type="button" id="newGameSamePeople" class="gameOver hidden form-control">Click Here To Start A New Game With The Same Questions/Teams</button>
 		<button type="button" id="newGameDifferentPeople" class="gameOver hidden form-control">Click Here To Start Entirely Over (new questions/teams)</button>
 	</div>

@@ -132,9 +132,6 @@ $(document).ready(function() {
 	// load questions based on above criteria
 	
 	// TODO this will be in some kind of loop - DONE
-	
-	
-	
 
 	// randomize questions - DONE
 
@@ -222,6 +219,7 @@ $(document).ready(function() {
 	    					console.log("COUNT: game timer is: " + game.gameTimer.timer + " clock running is: " + game.gameTimer.clockRunning);
 	    					console.log("time is up!");
 	    					game.gameTimer.pause = true;
+	    					$("#scoreScreen").removeClass("hidden");
 	    				}
 	    				else if (game.gameTimer.timer > game.roundMaxTime) {
 	    					game.gameTimer.timer = game.roundMaxTime;
@@ -317,15 +315,23 @@ $(document).ready(function() {
 			var newRow = document.createElement("row");
 			var newDiv = document.createElement("div");
 			var newInput = document.createElement("input");
+			var newLabel = document.createElement("label");
 			newInput.type = "checkbox";
-			newInput.name = "questionCheckbox";
+			newInput.name = "selectQuestionTypesCheckbox";
 			newInput.id = item;
-			newInput.html = item;
+			newInput.value = item;
+			newLabel.for = item;
+			newLabel.innerHTML = item;
 			targetParent.append(newRow);
 			newRow.append(newDiv);
+			newDiv.append(newLabel);
 			newDiv.append(newInput);
+			(document.createTextNode('text for label after checkbox'));
 			newInput.setAttribute("class", "form-control");
+			newInput.setAttribute("class", "big-checkbox");
+			// newInput.setAttribute("autocomplete", "off");
 			console.log("adding this array item: " + item);
+
 		});
 	}
 

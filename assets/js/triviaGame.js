@@ -168,7 +168,7 @@ $(document).ready(function() {
 									geographyQuestionsFillInTheBlank],
 			roundMaxTime:0, // assume seconds - no infinite, but give users ability to set at 'high' (nearly unlimited) number
 			round: {
-				team:"",
+				team:"team1",
 				question:"",
 				answer:"",
 				type:"",
@@ -266,16 +266,16 @@ $(document).ready(function() {
 				incorrectAnswers:0, // TODO add
 				noAnswer:0, // TODO add
 				needTieBreaker:false // TODO add
-			},
+			}//,
 			
-			team2: { // TODO dynamically create me 
-				teamName:"Team Bot", // TODO add
-				members:"Robot", // TODO add
-				correctAnswers:0, // TODO add
-				incorrectAnswers:0, // TODO add
-				noAnswer:0, // TODO add
-				needTieBreaker:false // TODO add
-			}
+			// team2: { // TODO dynamically create me 
+			// 	teamName:"Team Bot", // TODO add
+			// 	members:"Robot", // TODO add
+			// 	correctAnswers:0, // TODO add
+			// 	incorrectAnswers:0, // TODO add
+			// 	noAnswer:0, // TODO add
+			// 	needTieBreaker:false // TODO add
+			// }
 		}
 		createCheckboxArrayForQuestionTypes();
 	}
@@ -365,7 +365,7 @@ $(document).ready(function() {
 			console.log("For Grading: " + game.round.answer.toLowerCase() + " VS " + game.round.answerToBeGraded.toLowerCase())
 			if (game.round.answer.toLowerCase() === game.round.answerToBeGraded.toLowerCase()) {
 				console.log("*****AMAZING!!!!  The answer was EXACTLY right! ***** (this will almost NEVER happen)");
-				// TODO add correct answer ++
+				updateScoreAndChangeTeam("correct");
 				$("#gradingScreen").addClass("hidden");
 			}
 			else {
@@ -377,13 +377,16 @@ $(document).ready(function() {
 		}
 		else {
 			console.log("They didn't try very hard - answer was blank - it is WRONG");
-			// TODO add answer wrong ++
+			updateScoreAndChangeTeam("noAnswer");
 			$("#gradingScreen").addClass("hidden");
 		}
 	}
 
 	function getOneRandomQuestionAndRemoveItFromPool() {
 		console.log("===== We're in get one question from pool: =====");
+
+		console.log("for testing puroses");
+		console.log(game.team1);
 
 		if (game.round.needsToBeGraded) {
 			console.log("Yikes!  We should grade the previous answer before getting our own question!");
@@ -486,11 +489,11 @@ $(document).ready(function() {
 		//console.log("MC answer is: >" + clickedId + "< correct answer is: >" + game.round.correctAnswerStoredIn + "<");
 		if (game.round.correctAnswerStoredIn == clickedId) {
 			console.log("looks like we have the correct answer!");
-			// TODO add the 'we win' logic - correct answer ++
+			updateScoreAndChangeTeam("correct");
 		}
 		else {
 			console.log("MC answer is incorrect: " + clickedId);
-			// TODO add the 'we lose' logic - incorrect answer ++
+			updateScoreAndChangeTeam("wrong");
 		}
 		game.gameTimer.pause = true;
 		game.gameTimer.timer = 0;
@@ -512,6 +515,55 @@ $(document).ready(function() {
 		var numberOfQuestionsRemaining = Object.keys(gameQuestions).length;
 		console.log("Number of questions remaining in this entire deck: " + numberOfQuestionsRemaining);
 		return numberOfQuestionsRemaining;
+	}
+
+	function updateScoreAndChangeTeam(scoreUpdate) {
+		console.log("We're on team: " + game.round.team + " score update is: " + scoreUpdate);
+
+		if (scoreUpdate == "correct") {
+			console.log(game.round.team + " logged answer correct!");
+			game[game.round.team].correctAnswers++;
+		}
+		else if (scoreUpdate == "wrong") {
+			console.log(game.round.team + " logged answer wrong!");
+			game[game.round.team].incorrectAnswers++;
+		}
+		else if (scoreUpdate == "noAnswer") {
+			console.log(game.round.team + " logged no answer!");
+			game[game.round.team].noAnswer++
+		}
+
+		// TODO change team
+
+		if (game.numberOfTeams > 1) {
+			// var currentTeam = game.round.team;
+			var nextTeam = "";
+
+
+for (var i = 1; i<= game.numberOfTeams; i++) {
+	var teamFound = false;
+	for (var key in game) {
+		console.log("looking for:" + game.round.team + " got: " + key);
+		if (key == game.round.team) {
+			console.log("We found this team - now we need the next team");
+			teamFound = true;
+		}
+		else if (teamFound && nextTeam == "") {
+			game.round.team = key;
+			console.log("Next team is: " + game.round.team);
+		}
+		else {
+			console.log("Back to team 1 since we didn't find a higher teamNumber");
+			game.round.team = "team1";
+		}
+	}
+}
+
+
+		}
+		else {
+			console.log("We have only 1 team - so no need to change anything");
+		}
 	}
 
 	function createAndShuffleRandomNumberArray(number) {
@@ -649,16 +701,16 @@ $(document).ready(function() {
 	});
 
 	$("#correctAnswerButton").click(function () {
-		// TODO add to correct total
 		// console.log("The grader said:  answer was CORRECT")
 		$("#gradingScreen").addClass("hidden");
+		updateScoreAndChangeTeam("correct")
 		game.gameTimer.pause = false;
 	});
 
 	$("#wrongAnswerButton").click(function () {
-		// TODO add to wrong total
 		// console.log("The grader said:  nope, incorrect");
 		$("#gradingScreen").addClass("hidden");
+		updateScoreAndChangeTeam("wrong")
 		game.gameTimer.pause = false;
 	});
 

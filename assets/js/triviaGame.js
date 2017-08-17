@@ -120,7 +120,7 @@ $(document).ready(function() {
 			answer:"Kidneys",
 			showBlanks:1,
 			type:"fitb"
-		} //,
+		},
 		// genfitb7: {
 		// 	question:"What actress won and academy award for playing another academy award winning actress?",
 		// 	answer:"?????",
@@ -273,15 +273,14 @@ $(document).ready(function() {
 			gameTimer: { 
 				timer:0,
 				clockRunning:false,
+				// showingScore:false,
 				pause:false,
-				// pauseLength:3,
 				start: function() {
 					console.log("****starting game timer called using : " + game.gameTimer.timer + " and clock is running: " + game.gameTimer.clockRunning + "*****")
 					if (!game.gameTimer.clockRunning) {
 						game.gameTimer.resetClock();
         				game.timeInterval = setInterval(game.gameTimer.count, 1000);
         				game.gameTimer.clockRunning = true;
-        				
       				}
       				else if (game.gameTimer.clockRunning) {
       					console.log("GameTimer Start was called with clock running - this is baaaddd mmmmkay");
@@ -293,23 +292,37 @@ $(document).ready(function() {
 				},
 				count: function() {
 					console.log("COUNT: call using: "  + game.gameTimer.timer + " clock running is: " + game.gameTimer.clockRunning + " paused: " + game.gameTimer.pause);
-					// console.log("Just because: " + game.currentQuestion);
+					// // console.log("Just because: " + game.currentQuestion);
 
+					// if (game.gameTimer.pause & game.gameTimer.timer == 0) {
+					// 	console.log("game is paused and timer is out");
+					// 	if (game.gameTimer.showingScore) {
+					// 		console.log("we've already shown the score - we're done here")
+					// 		game.gameTimer.showingScore = false;
+					// 		$("#scoreScreen").addClass("hidden");
+					// 	}
+					// 	else if (!($("#scoreScreen").hasClass("hidden"))) {
+					// 		console.log("Score Screen is up");
+					// 		// game.gameTimer.timer += 5;
+					// 		// game.gameTimer.showingScore = true;
+					// 		game.gameTimer.pause = false;
+					// 	}
+					// }
 					if (game.gameTimer.pause) {
 						console.log("game is paused for something...?");
 					}
 					else if (!game.gameTimer.pause) {
 						// console.log("game is not paused - continuing");
 						$("#scoreScreen").addClass("hidden");
-					
+
 						if ((game.gameTimer.timer <= game.roundMaxTime) && (game.gameTimer.timer > 0)) {
 	    					game.gameTimer.timer--;
 	    				}
 	    				else if (game.gameTimer.timer <= 0) {
 	    					console.log("COUNT: game timer is: " + game.gameTimer.timer + " clock running is: " + game.gameTimer.clockRunning);
 	    					console.log("time is up!");
-	    					game.gameTimer.pause = true;
-	    					$("#scoreScreen").removeClass("hidden");
+	    					game.gameTimer.pause = false; // change this to make the game pause between rounds
+	    					//$("#scoreScreen").removeClass("hidden");
 	    				}
 	    				else if (game.gameTimer.timer > game.roundMaxTime) {
 	    					game.gameTimer.timer = game.roundMaxTime;
@@ -332,6 +345,12 @@ $(document).ready(function() {
   					getOneRandomQuestionAndRemoveItFromPool();
   					game.gameTimer.start();
   				},
+  				// clearScoreScreenInputSeconds: function (thisManySeconds) {
+  				// 	setInterval(function () {
+  				// 		console.log("clearning score screen in " + thisManySeconds + " seconds");
+  				// 		$("#scoreScreen").click();
+  				// 	}, thisManySeconds * 1000);
+  				// },
 				timeConverter: function (t) { 
 				    //  Takes the current time in seconds and convert it to minutes and seconds (mm:ss).
 				    var minutes = Math.floor(t / 60);
@@ -412,7 +431,7 @@ $(document).ready(function() {
 			newInput.id = item;
 			newInput.value = item;
 			newLabel.for = item;
-			newLabel.innerHTML = item;
+			newLabel.innerHTML = item[0];
 			targetParent.append(newRow);
 			newRow.append(newDiv);
 			newDiv.append(newLabel);
@@ -420,8 +439,8 @@ $(document).ready(function() {
 			(document.createTextNode('text for label after checkbox'));
 			newInput.setAttribute("class", "form-control");
 			newInput.setAttribute("class", "big-checkbox");
+			newInput.setAttribute("disabled", true);
 			//console.log("adding this array item: " + item);
-
 		});
 	}
 
@@ -596,7 +615,7 @@ $(document).ready(function() {
 		game.round.needsToBeGraded = false;
 		game.round.answerToBeGraded = "";
 		game.round.correctAnswerStoredIn = "";
-		$("#displayTimeHere").html("Time Remaining: " + game.roundMaxTime);
+		$("#displayTimeHere").html("Time Remaining: " + game.gameTimer.timeConverter(game.roundMaxTime));
 
 		// TODO more here?
 	}
@@ -698,6 +717,17 @@ for (var i = 1; i<= game.numberOfTeams; i++) {
   	return array;
 	}
 
+	function clearScores() {
+		console.log("loop through teams and reset their scores to zero");
+		// TODO team loop (once teams are ready)
+		game.teams.team1.correctAnswer = 0;
+		game.teams.team1.wrongAnswer = 0;
+		game.teams.team1.noAnswer = 0;
+		game.currentQuestion = game.numberOfQuestions;
+		// game.round.
+		// TODO reset round here
+	}
+
 	function processAnswerSubmit(e) { // nabbed from: https://stackoverflow.com/questions/5384712/capture-a-form-submit-in-javascript
     if (e.preventDefault) e.preventDefault();    
 
@@ -762,14 +792,18 @@ for (var i = 1; i<= game.numberOfTeams; i++) {
 		}
 
 	$("#scoreScreen").click(function () {
-		// console.log("request received to dismiss score screen and continue");
-		// console.log("validating... current question num: " + game.currentQuestion + " >= " + game.numberOfQuestions + "?  if no, keep going")
+		console.log("request received to dismiss score screen and continue");
+		console.log("validating... current question num: " + game.currentQuestion + " >= " + game.numberOfQuestions + "?  if no, keep going")
 		$(".displayRoundHere").html("Round " + game.currentQuestion + " of " + game.numberOfQuestions);
 
 		if (game.currentQuestion >= game.numberOfQuestions) {
 			console.log("Click to continue:  No, game is over!");
+			if (game.round.needsToBeGraded) {
+				// grade the last question - if needed
+				$("#gradingScreen").removeClass("hidden");
+			}
 			$(".gameOver").removeClass("hidden");	
-			game.gameTimer.stop();	
+			game.gameTimer.stop();
 		}
 		else if (game.round.needsToBeGraded) {
 			// console.log("at score screen - we need to do some grading");
@@ -786,11 +820,17 @@ for (var i = 1; i<= game.numberOfTeams; i++) {
 	});
 
 	$("#newGameSamePeople").click(function () {
-		// TODO something here
+		clearScores();
+		$("#scoreScreen").addClass("hidden");
+		beginGame();
+		game.gameTimer.nextQuestion();
 	});
 
 	$("#newGameDifferentPeople").click(function () {
-		// TODO something here
+		initializeGame();
+		$("#scoreScreen").addClass("hidden");
+		beginGame();
+		game.gameTimer.nextQuestion();
 	});
 
 	$("#stopHere").click(function () {
@@ -801,6 +841,7 @@ for (var i = 1; i<= game.numberOfTeams; i++) {
 	$(".mc").click(function (event) {
 		checkMultipleChoiceAnswer(event.target.id);
 		$("#scoreScreen").removeClass("hidden");
+		// game.gameTimer.start(5);
 	});
 
 	$("#correctAnswerButton").click(function () {
@@ -822,7 +863,6 @@ for (var i = 1; i<= game.numberOfTeams; i++) {
 		// $("#setupScreen").addClass("hidden");
 		$("#teamCreationScreen").addClass("hidden");
 		createTeams();
-		// beginGame();
 	});
 
 });

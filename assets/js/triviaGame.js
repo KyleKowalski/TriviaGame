@@ -400,8 +400,12 @@ $(document).ready(function() {
 				
 	}
 
-	function beginGame() {
-		getQuestionsForGame();
+	function beginGame(newGame) {
+		if (newGame) {
+			console.log("getting new questions");
+			getQuestionsForGame();
+		}
+		$(".gameOver").addClass("hidden");
 		console.log("This will be a " + game.numberOfQuestions + " question long game.");
 		game.gameTimer.nextQuestion();
 	}
@@ -771,7 +775,7 @@ for (var i = 1; i<= game.numberOfTeams; i++) {
   			// console.log("just one team eh?  Let's go");
   			$("#setupScreen").addClass("hidden");
   			// TODO create a single team here automagically (or prompt?)
-			beginGame();
+			beginGame(true);
   		}
   		else {
   			console.log("More then 1 team selected... we do something here");
@@ -792,23 +796,11 @@ for (var i = 1; i<= game.numberOfTeams; i++) {
 		console.log("request received to dismiss score screen and continue");
 		console.log("validating... current question num: " + game.currentQuestion + " >= " + game.numberOfQuestions + "?  if no, keep going")
 		$(".displayRoundHere").html("Round " + game.currentQuestion + " of " + game.numberOfQuestions);
-
-		// TODO untangle the scoring stuff - we don't need it anymore.
 		if (game.currentQuestion >= game.numberOfQuestions) {
 			console.log("Click to continue:  No, game is over!");
-			// if (game.round.needsToBeGraded) {
-			// 	// grade the last question - if needed
-			// 	$("#gradingScreen").removeClass("hidden");
-			// }
 			$(".gameOver").removeClass("hidden");	
 			game.gameTimer.stop();
 		}
-		// else if (game.round.needsToBeGraded) {
-		// 	// console.log("at score screen - we need to do some grading");
-		// 	$("#scoreScreen").addClass("hidden");
-		// 	$("#gradingScreen").removeClass("hidden");
-		// 	game.gameTimer.nextQuestion();
-		// }
 		else {			
 			// console.log("Click to continue:  Ok");
 			game.gameTimer.pause = false;
@@ -823,8 +815,7 @@ for (var i = 1; i<= game.numberOfTeams; i++) {
 		console.log("New Game Same: game current question: " + game.currentQuestion);
 		$("#scoreScreen").addClass("hidden");
 		$(".gameOver").addClass("hidden");
-		beginGame();
-		game.gameTimer.nextQuestion();
+		beginGame(false); // false signifies we don't need new questions in begin game
 	});
 
 	$("#newGameDifferentPeople").click(function () {
@@ -833,8 +824,6 @@ for (var i = 1; i<= game.numberOfTeams; i++) {
 		$(".gameOver").addClass("hidden");
 		$("#scoreScreen").addClass("hidden");
 		$("#setupScreen").removeClass("hidden");
-		// beginGame();
-		// game.gameTimer.nextQuestion();
 	});
 
 	$("#stopHere").click(function () {

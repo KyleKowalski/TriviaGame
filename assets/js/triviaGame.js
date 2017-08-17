@@ -292,6 +292,7 @@ $(document).ready(function() {
 				},
 				count: function() {
 					console.log("COUNT: call using: "  + game.gameTimer.timer + " clock running is: " + game.gameTimer.clockRunning + " paused: " + game.gameTimer.pause);
+					console.log("game current question: " + game.currentQuestion + " game number of questions: " + game.numberOfQuestions);
 					// // console.log("Just because: " + game.currentQuestion);
 
 					// if (game.gameTimer.pause & game.gameTimer.timer == 0) {
@@ -341,7 +342,9 @@ $(document).ready(function() {
   				},
   				nextQuestion: function() {
   					game.gameTimer.stop();
+  					console.log("@#$%@#$%@#$%@#$% adding to current question +1 from: " + game.currentQuestion);
   					game.currentQuestion++;
+  					console.log("@#$%@#$%@#$%@#$% adding to current question +1 to: " + game.currentQuestion);
   					getOneRandomQuestionAndRemoveItFromPool();
   					game.gameTimer.start();
   				},
@@ -476,6 +479,7 @@ $(document).ready(function() {
 				console.log("*****AMAZING!!!!  The answer was EXACTLY right! ***** (this will almost NEVER happen)");
 				updateScoreAndChangeTeam("correct");
 				$("#gradingScreen").addClass("hidden");
+				$("#scoreScreen").removeClass("hidden");
 			}
 			else {
 				console.log("Manual grading required!");
@@ -488,7 +492,9 @@ $(document).ready(function() {
 			console.log("They didn't try very hard - answer was blank - it is WRONG");
 			updateScoreAndChangeTeam("noAnswer");
 			$("#gradingScreen").addClass("hidden");
+			$("#scoreScreen").removeClass("hidden");
 		}
+		game.round.gradingRequired = false;
 	}
 
 	function getOneRandomQuestionAndRemoveItFromPool() {
@@ -496,12 +502,6 @@ $(document).ready(function() {
 
 		// console.log("for testing puroses");
 		// console.log(game.round.currentTeam);
-
-		if (game.round.needsToBeGraded) {
-			console.log("Yikes!  We should grade the previous answer before getting our own question!");
-			gradingRequired();
-		}
-		
 		cleanUpForNextQuestion();
 
 		var numberOfQuestionsRemaining = getNumberOfQuestionsRemaining();
@@ -647,14 +647,8 @@ $(document).ready(function() {
 		$("#numberWrongHere").html("Wrong: " + game.teams[game.round.team].wrongAnswer);
 		$("#numberNoAnswerHere").html("No Answer: " + game.teams[game.round.team].noAnswer);
 		console.log("answer to be graded: >" + game.round.answerToBeGraded + "< or >" + game.round.needsToBeGraded + "<");
-		if (game.round.answerToBeGraded == "") {
-			$(".gradingRequiredMessage").addClass("hidden");
-		}
-		else {
-			$(".gradingRequiredMessage").removeClass("hidden");
-		}
 
-		// TODO change team
+		// TODO change team - stub is below - it's not tested
 
 		if (game.numberOfTeams > 1) {
 			// var currentTeam = game.round.team;
@@ -723,7 +717,7 @@ for (var i = 1; i<= game.numberOfTeams; i++) {
 		game.teams.team1.correctAnswer = 0;
 		game.teams.team1.wrongAnswer = 0;
 		game.teams.team1.noAnswer = 0;
-		game.currentQuestion = game.numberOfQuestions;
+		game.currentQuestion = 0;
 		// game.round.
 		// TODO reset round here
 	}
@@ -740,7 +734,10 @@ for (var i = 1; i<= game.numberOfTeams; i++) {
 		}
 		// console.log("final answer: >" + game.round.answerToBeGraded + "<");
 		// console.log("stopping clock with " + game.gameTimer.timer + " seconds remaining");
-		$("#scoreScreen").removeClass("hidden");
+		
+		$("#gradingScreen").removeClass("hidden");
+		gradingRequired();
+		//$("#scoreScreen").removeClass("hidden");
 		game.gameTimer.pause = true;
 		game.gameTimer.timer = 0;
 
@@ -796,24 +793,26 @@ for (var i = 1; i<= game.numberOfTeams; i++) {
 		console.log("validating... current question num: " + game.currentQuestion + " >= " + game.numberOfQuestions + "?  if no, keep going")
 		$(".displayRoundHere").html("Round " + game.currentQuestion + " of " + game.numberOfQuestions);
 
+		// TODO untangle the scoring stuff - we don't need it anymore.
 		if (game.currentQuestion >= game.numberOfQuestions) {
 			console.log("Click to continue:  No, game is over!");
-			if (game.round.needsToBeGraded) {
-				// grade the last question - if needed
-				$("#gradingScreen").removeClass("hidden");
-			}
+			// if (game.round.needsToBeGraded) {
+			// 	// grade the last question - if needed
+			// 	$("#gradingScreen").removeClass("hidden");
+			// }
 			$(".gameOver").removeClass("hidden");	
 			game.gameTimer.stop();
 		}
-		else if (game.round.needsToBeGraded) {
-			// console.log("at score screen - we need to do some grading");
-			$("#scoreScreen").addClass("hidden");
-			$("#gradingScreen").removeClass("hidden");
-			game.gameTimer.nextQuestion();
-		}
+		// else if (game.round.needsToBeGraded) {
+		// 	// console.log("at score screen - we need to do some grading");
+		// 	$("#scoreScreen").addClass("hidden");
+		// 	$("#gradingScreen").removeClass("hidden");
+		// 	game.gameTimer.nextQuestion();
+		// }
 		else {			
 			// console.log("Click to continue:  Ok");
 			game.gameTimer.pause = false;
+			console.log("CALLING NEXT QUESTION AT SCORE SCREEN CLICK");
 			game.gameTimer.nextQuestion();
 			$("#scoreScreen").addClass("hidden"); // TODO move this to a more appropriate space
 		}
@@ -821,16 +820,21 @@ for (var i = 1; i<= game.numberOfTeams; i++) {
 
 	$("#newGameSamePeople").click(function () {
 		clearScores();
+		console.log("New Game Same: game current question: " + game.currentQuestion);
 		$("#scoreScreen").addClass("hidden");
+		$(".gameOver").addClass("hidden");
 		beginGame();
 		game.gameTimer.nextQuestion();
 	});
 
 	$("#newGameDifferentPeople").click(function () {
 		initializeGame();
+		console.log("New Game Different: game current question: " + game.currentQuestion);
+		$(".gameOver").addClass("hidden");
 		$("#scoreScreen").addClass("hidden");
-		beginGame();
-		game.gameTimer.nextQuestion();
+		$("#setupScreen").removeClass("hidden");
+		// beginGame();
+		// game.gameTimer.nextQuestion();
 	});
 
 	$("#stopHere").click(function () {
@@ -847,15 +851,17 @@ for (var i = 1; i<= game.numberOfTeams; i++) {
 	$("#correctAnswerButton").click(function () {
 		// console.log("The grader said:  answer was CORRECT")
 		$("#gradingScreen").addClass("hidden");
-		updateScoreAndChangeTeam("correct")
-		game.gameTimer.pause = false;
+		updateScoreAndChangeTeam("correct");
+		$("#scoreScreen").removeClass("hidden");
+		game.gameTimer.pause = true;
 	});
 
 	$("#wrongAnswerButton").click(function () {
 		// console.log("The grader said:  nope, incorrect");
 		$("#gradingScreen").addClass("hidden");
-		updateScoreAndChangeTeam("wrong")
-		game.gameTimer.pause = false;
+		updateScoreAndChangeTeam("wrong");
+		$("#scoreScreen").removeClass("hidden");
+		game.gameTimer.pause = true;
 	});
 
 	$("#teamCreationButton").click(function () {

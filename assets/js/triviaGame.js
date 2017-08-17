@@ -152,6 +152,12 @@ $(document).ready(function() {
 	var game = {};
 	var gameQuestions = {};
 	initializeGame();
+
+	// mapFunction(); // TODO figure this out later
+
+	// function mapFunction() {
+	// 	Map.prototype.keys
+	// };
 	
 	// createCheckboxArrayForQuestionTypes()
 
@@ -185,7 +191,7 @@ $(document).ready(function() {
 				timer:0,
 				clockRunning:false,
 				pause:false,
-				pauseLength:3,
+				// pauseLength:3,
 				start: function() {
 					console.log("****starting game timer called using : " + game.gameTimer.timer + " and clock is running: " + game.gameTimer.clockRunning + "*****")
 					if (!game.gameTimer.clockRunning) {
@@ -258,24 +264,25 @@ $(document).ready(function() {
 				    return minutes + ":" + seconds;
   				}
   			},
-
-			team1: { // TODO dynamically create me
-				teamName:"Team Human", // TODO add
-				members:"Kyle", // TODO add
-				correctAnswers:0, // TODO add
-				incorrectAnswers:0, // TODO add
-				noAnswer:0, // TODO add
-				needTieBreaker:false // TODO add
-			}//,
-			
-			// team2: { // TODO dynamically create me 
-			// 	teamName:"Team Bot", // TODO add
-			// 	members:"Robot", // TODO add
-			// 	correctAnswers:0, // TODO add
-			// 	incorrectAnswers:0, // TODO add
-			// 	noAnswer:0, // TODO add
-			// 	needTieBreaker:false // TODO add
-			// }
+  			teams: {
+				team1: { // TODO dynamically create me
+					teamName:"Team Human", // TODO add
+					members:"Kyle", // TODO add
+					correctAnswer:0, // TODO add
+					wrongAnswer:0, // TODO add
+					noAnswer:0, // TODO add
+					needTieBreaker:false // TODO add
+				},
+				
+				team2: { // TODO dynamically create me 
+					teamName:"Team Bot", // TODO add
+					members:"Robot", // TODO add
+					correctAnswer:0, // TODO add
+					wrongAnswer:0, // TODO add
+					noAnswer:0, // TODO add
+					needTieBreaker:false // TODO add
+				}
+			}
 		}
 		createCheckboxArrayForQuestionTypes();
 	}
@@ -341,11 +348,11 @@ $(document).ready(function() {
 
 		for (var i = 1; i<= game.numberOfTeams; i++) {
 			var teamExists = false;
-			for (var key in game) {
+			for (var key in game.teams) {
 				console.log("looking for: team" + [i] + " got: " + key);
 				var thisTeam = "team" + [i];
 				if (key == thisTeam || teamExists == true) {
-					//console.log("Team exists - moving on");
+					console.log("Team exists - moving on");
 					teamExists = true;
 				}
 				else {
@@ -386,7 +393,7 @@ $(document).ready(function() {
 		console.log("===== We're in get one question from pool: =====");
 
 		console.log("for testing puroses");
-		console.log(game.team1);
+		console.log(game.teams.team1);
 
 		if (game.round.needsToBeGraded) {
 			console.log("Yikes!  We should grade the previous answer before getting our own question!");
@@ -522,15 +529,27 @@ $(document).ready(function() {
 
 		if (scoreUpdate == "correct") {
 			console.log(game.round.team + " logged answer correct!");
-			game[game.round.team].correctAnswers++;
+			game.teams[game.round.team].correctAnswer++;
 		}
 		else if (scoreUpdate == "wrong") {
 			console.log(game.round.team + " logged answer wrong!");
-			game[game.round.team].incorrectAnswers++;
+			game.teams[game.round.team].wrongAnswer++;
 		}
 		else if (scoreUpdate == "noAnswer") {
 			console.log(game.round.team + " logged no answer!");
-			game[game.round.team].noAnswer++
+			game.teams[game.round.team].noAnswer++
+		}
+
+		$("#thisTeamsNameHere").html("Team: " + game.teams[game.round.team].teamName);
+		$("#numberCorrectHere").html("Correct: " + game.teams[game.round.team].correctAnswer);
+		$("#numberWrongHere").html("Wrong: " + game.teams[game.round.team].wrongAnswer);
+		$("#numberNoAnswerHere").html("No Answer: " + game.teams[game.round.team].noAnswer);
+		console.log("answer to be graded: >" + game.round.answerToBeGraded + "< or >" + game.round.needsToBeGraded + "<");
+		if (game.round.answerToBeGraded == "") {
+			$(".gradingRequiredMessage").addClass("hidden");
+		}
+		else {
+			$(".gradingRequiredMessage").removeClass("hidden");
 		}
 
 		// TODO change team
@@ -542,7 +561,7 @@ $(document).ready(function() {
 
 for (var i = 1; i<= game.numberOfTeams; i++) {
 	var teamFound = false;
-	for (var key in game) {
+	for (var key in game.teams) {
 		console.log("looking for:" + game.round.team + " got: " + key);
 		if (key == game.round.team) {
 			console.log("We found this team - now we need the next team");
@@ -641,6 +660,7 @@ for (var i = 1; i<= game.numberOfTeams; i++) {
   		if (game.numberOfTeams == 1 || game.numberOfTeams === 0) {
   			// console.log("just one team eh?  Let's go");
   			$("#setupScreen").addClass("hidden");
+  			// TODO create a single team here automagically (or prompt?)
 			beginGame();
   		}
   		else {
@@ -650,7 +670,7 @@ for (var i = 1; i<= game.numberOfTeams; i++) {
     	return false;
 	}
 
-	var form = document.getElementById('setupForm'); // nabbed from: https://stackoverflow.com/questions/5384712/capture-a-form-submit-in-javascript
+	var form = document.getElementById('setupForm'); // source nabbed from: https://stackoverflow.com/questions/5384712/capture-a-form-submit-in-javascript
 		if (form.attachEvent) {
     		form.attachEvent("submit", processSetupSubmit);
 		} 
@@ -712,6 +732,14 @@ for (var i = 1; i<= game.numberOfTeams; i++) {
 		$("#gradingScreen").addClass("hidden");
 		updateScoreAndChangeTeam("wrong")
 		game.gameTimer.pause = false;
+	});
+
+	$("#teamCreationButton").click(function () {
+		console.log("clicked 'go' for team creation - starting")
+		// $("#setupScreen").addClass("hidden");
+		$("#teamCreationScreen").addClass("hidden");
+		createTeams();
+		// beginGame();
 	});
 
 });

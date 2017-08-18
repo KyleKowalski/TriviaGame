@@ -1,7 +1,4 @@
-var availableQuestionsArray = 	[["General Questions Multiple Choice",generalQuestionsMultipleChoice],
-							["General Questions Fill In The Blank",generalQuestionsFillInTheBlank],
-							["Geography Questions Multiple Choice",geographyQuestionsMultipleChoice],
-							["Geography Questions Fill In The Blank",geographyQuestionsFillInTheBlank]]
+
 
 
 var generalQuestionsMultipleChoice = {
@@ -93,12 +90,12 @@ var generalQuestionsFillInTheBlank = {
 		showBlanks:1,
 		type:"fitb"
 	},
-	// genfitb7: {
-	// 	question:"What actress won and academy award for playing another academy award winning actress?",
-	// 	answer:"?????",
-	// 	showBlanks:1,
-	// 	type:"fitb"
-	// }
+	genfitb7: {
+		question:"What actress won and academy award for playing another academy award winning actress?",
+		answer:"Cate Blanchett (in The Aviator playing Katharine Hepburn)",
+		showBlanks:1,
+		type:"fitb"
+	}
 }
 
 var geographyQuestionsMultipleChoice = {
@@ -158,3 +155,8 @@ var geographyQuestionsFillInTheBlank = {
 		type:"fitb"
 	}
 }
+
+var availableQuestionsArray = 	[["General Questions Multiple Choice", generalQuestionsMultipleChoice],
+								["General Questions Fill In The Blank", generalQuestionsFillInTheBlank],
+								["Geography Questions Multiple Choice", geographyQuestionsMultipleChoice],
+								["Geography Questions Fill In The Blank", geographyQuestionsFillInTheBlank]]

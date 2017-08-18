@@ -17,10 +17,11 @@ $(document).ready(function() {
 			numberOfQuestions:0,
 			currentQuestion:0,
 			outOfQuestions:false,
-			questionTypesSelected:[generalQuestionsMultipleChoice,
-									geographyQuestionsMultipleChoice,
-									generalQuestionsFillInTheBlank,
-									geographyQuestionsFillInTheBlank],
+			questionTypesSelected:[],
+									// [generalQuestionsMultipleChoice,
+									// geographyQuestionsMultipleChoice,
+									// generalQuestionsFillInTheBlank,
+									// geographyQuestionsFillInTheBlank],
 			roundMaxTime:0, // assume seconds - no infinite, but give users ability to set at 'high' (nearly unlimited) number
 			round: {
 				team:"team1",
@@ -170,15 +171,14 @@ $(document).ready(function() {
 		targetParent = $("#checkboxArrayForQuestionTypesHere");
 		targetParent.empty();
 		availableQuestionsArray.forEach(function(item){
-			
 			var newRow = document.createElement("row");
 			var newDiv = document.createElement("div");
 			var newInput = document.createElement("input");
 			var newLabel = document.createElement("label");
 			newInput.type = "checkbox";
 			newInput.name = "selectQuestionTypesCheckbox";
-			newInput.id = item;
-			newInput.value = item;
+			newInput.id = item[0];
+			newInput.value = item[0];
 			newLabel.for = item;
 			newLabel.innerHTML = item[0];
 			targetParent.append(newRow);
@@ -188,7 +188,8 @@ $(document).ready(function() {
 			(document.createTextNode('text for label after checkbox'));
 			newInput.setAttribute("class", "form-control");
 			newInput.setAttribute("class", "big-checkbox");
-			newInput.setAttribute("disabled", true);
+			newInput.setAttribute("checked", true);
+			// newInput.setAttribute("disabled", true);
 		});
 	}
 
@@ -361,6 +362,8 @@ $(document).ready(function() {
 	function getNumberOfQuestionsRemaining() {
 		var numberOfQuestionsRemaining = Object.keys(gameQuestions).length;
 		console.log("Number of questions remaining in this entire deck: " + numberOfQuestionsRemaining);
+		$("#countOfQuestionsRemaining").html("Remaining Questions In Deck: " + numberOfQuestionsRemaining);
+		// TODO move this count somewhere nicer.  
 		return numberOfQuestionsRemaining;
 	}
 
@@ -501,12 +504,23 @@ $(document).ready(function() {
   		if (game.numberOfTeams == 1 || game.numberOfTeams === 0) {
   			$("#setupScreen").addClass("hidden");
   			// TODO create a single team here automagically (or prompt?)
-			beginGame(true);
+			
   		}
   		else {
   			console.log("More then 1 team selected... we do something here");
   			createTeams();
   		}
+
+  		$("input:checkbox[name=selectQuestionTypesCheckbox]:checked").each(function(){
+  			var thisQuestionArrayItem = [] 
+  			for (var i = 0; i < availableQuestionsArray.length; i++) {
+  				thisQuestionArrayItem = availableQuestionsArray[i][0];
+  				if ($(this).val() == thisQuestionArrayItem) { 
+	    			game.questionTypesSelected.push(availableQuestionsArray[i][1]);
+	    		}
+	    	}
+		});
+  		beginGame(true);
     	return false;
 	}
 
@@ -529,7 +543,6 @@ $(document).ready(function() {
 		}
 		else if (game.currentQuestion < game.numberOfQuestions) {			
 			game.gameTimer.pause = false;
-			console.log("CALLING NEXT QUESTION AT SCORE SCREEN CLICK");
 			game.gameTimer.nextQuestion();
 			$("#scoreScreen").addClass("hidden");
 		}

@@ -132,7 +132,7 @@ var geographyQuestionsMultipleChoice = {
 		fakeAnswer3:"95%"
 	},
 	geomc5: {
-		question:"Which city does not have an official Disneyland/world?",
+		question:"Which city does not have an official Disneyland/World?",
 		answer:"Moscow",
 		type:"mc",
 		fakeAnswer1:"Tokyo",

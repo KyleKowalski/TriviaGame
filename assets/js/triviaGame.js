@@ -17,11 +17,7 @@ $(document).ready(function() {
 			numberOfQuestions:0,
 			currentQuestion:0,
 			outOfQuestions:false,
-			questionTypesSelected:[],
-									// [generalQuestionsMultipleChoice,
-									// geographyQuestionsMultipleChoice,
-									// generalQuestionsFillInTheBlank,
-									// geographyQuestionsFillInTheBlank],
+			questionTypesSelected:[], // these dynamically load based on game setup
 			roundMaxTime:0, // assume seconds - no infinite, but give users ability to set at 'high' (nearly unlimited) number
 			round: {
 				team:"team1",
@@ -36,11 +32,9 @@ $(document).ready(function() {
 				needsToBeGraded:false,
 				answerToBeGraded:""
 			},
-
 			gameTimer: { 
 				timer:0,
 				clockRunning:false,
-				// showingScore:false,
 				pause:false,
 				start: function() {
 					console.log("****starting game timer called using : " + game.gameTimer.timer + " and clock is running: " + game.gameTimer.clockRunning + "*****")
@@ -94,9 +88,9 @@ $(document).ready(function() {
   				},
   				nextQuestion: function() {
   					game.gameTimer.stop();
-  					console.log("@#$%@#$%@#$%@#$% adding to current question +1 from: " + game.currentQuestion);
+  					// console.log("@#$%@#$%@#$%@#$% adding to current question +1 from: " + game.currentQuestion);
   					game.currentQuestion++;
-  					console.log("@#$%@#$%@#$%@#$% adding to current question +1 to: " + game.currentQuestion);
+  					// console.log("@#$%@#$%@#$%@#$% adding to current question +1 to: " + game.currentQuestion);
   					getOneRandomQuestionAndRemoveItFromPool();
   					game.gameTimer.start();
   				},
@@ -142,9 +136,21 @@ $(document).ready(function() {
 			// TODO establish teams (screens and prompts)
 			// TODO select question types dynamically
 			// TODO select number of questions, timer, etc
-			gameQuestions = getAllQuestions(game.questionTypesSelected);
-				
+			gameQuestions = getAllQuestions(game.questionTypesSelected);	
 	}
+
+	function iterateThroughTeams() { // This is my boiler plate to get everything out of teams
+		console.log(game.teams);
+
+		$.each(game.teams, function(key, value) {
+		  console.log("team: " + key);
+		  $.each(value, function (key, innerValue) {
+		  	console.log("team stats: " + key + " value: " + innerValue);
+		  });
+		});
+	}
+
+	iterateThroughTeams();
 
 	function beginGame(newGame) {
 		if (newGame) {
@@ -197,25 +203,37 @@ $(document).ready(function() {
 		console.log("Request received to create teams, this many: " + game.numberOfTeams);
 		$("#teamCreationScreen").removeClass("hidden"); // TODO move this?
 
-		for (var i = 1; i<= game.numberOfTeams; i++) {
+		for (var i = 1; i <= game.numberOfTeams; i++) {
 			var teamExists = false;
-			for (var key in game.teams) {
-				console.log("looking for: team" + [i] + " got: " + key);
-				var thisTeam = "team" + [i];
-				if (key == thisTeam || teamExists == true) {
-					console.log("Team exists - moving on");
+			$.each(game.teams, function(key, value) {
+				var thisTeam = "team" + [i]
+				if (thisTeam == key || teamExists == true) {
 					teamExists = true;
 				}
 				else {
-					// console.log("team" + [i] + " does not exist");
+					// console.log("team" + [i] + "  this isn't it... moving on");
 				}
-			}
+			});
 			if (!teamExists) {
 				console.log("*****Creating new team: team" + [i]);
-				$("#teamName").html("Team " + [i] + " Name:");
+				var newTeamName = "team" + [i];
+				var newTeamObject = {[newTeamName]: {
+										teamName:"", // TODO add
+										members:"", // TODO add
+										correctAnswer:0, // TODO add
+										wrongAnswer:0, // TODO add
+										noAnswer:0, // TODO add
+										needTieBreaker:false // TODO add
+									}
+				}
+				console.log(newTeamObject);
+				// $("#teamName").html("Team " + [i] + " Name:");
 				// TODO create and store team information here
+				game.teams = Object.assign(game.teams, newTeamObject);
 			}
 		}
+		console.log("FINAL FINAL FINAL FINAL FINAL");
+		console.log(game.teams);
 	}
 
 	function gradingRequired() {
@@ -274,7 +292,7 @@ $(document).ready(function() {
 			game.round.correctAnswerStoredIn = "mcAnswer" + randomNumberArray[0];
 
 			// TODO modify these to be not present at start, but on click
-			$("#mcAnswer" + randomNumberArray[0]).addClass("bg-success");
+			// $("#mcAnswer" + randomNumberArray[0]).addClass("bg-success");
 			$("#mcAnswer" + randomNumberArray[1]).removeClass("bg-success");
 			$("#mcAnswer" + randomNumberArray[2]).removeClass("bg-success");
 			$("#mcAnswer" + randomNumberArray[3]).removeClass("bg-success");
@@ -505,6 +523,12 @@ $(document).ready(function() {
   			$("#setupScreen").addClass("hidden");
   			// TODO create a single team here automagically (or prompt?)
 			
+  		}
+  		else if (game.numberOfTeams < 0) {
+  			// TODO handle if it's not a number as well
+  			console.log("So... uhh... negative teams huh?");
+  			alert ("Try a better number for teams, eh?");
+  			return false;
   		}
   		else {
   			console.log("More then 1 team selected... we do something here");

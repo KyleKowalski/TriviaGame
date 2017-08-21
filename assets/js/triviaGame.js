@@ -53,7 +53,7 @@ $(document).ready(function() {
 				},
 				count: function() {
 					console.log("COUNT: call using: "  + game.gameTimer.timer + " clock running is: " + game.gameTimer.clockRunning + " paused: " + game.gameTimer.pause);
-					console.log("game current question: " + game.currentQuestion + " game number of questions: " + game.numberOfQuestions);
+					// console.log("game current question: " + game.currentQuestion + " game number of questions: " + game.numberOfQuestions);
 
 					if (game.gameTimer.pause) {
 						console.log("game is paused for something...?");
@@ -68,7 +68,8 @@ $(document).ready(function() {
 	    					console.log("COUNT: game timer is: " + game.gameTimer.timer + " clock running is: " + game.gameTimer.clockRunning);
 	    					console.log("time is up!");
 	    					$("#scoreScreen").removeClass("hidden");
-	    					updateScoreAndChangeTeam("noAnswer");
+	    					updateScore("noAnswer");
+	    					changeTeam();
 	    					game.gameTimer.pause = true; 
 	    				}
 	    				else if (game.gameTimer.timer > game.roundMaxTime) {
@@ -139,18 +140,18 @@ $(document).ready(function() {
 			gameQuestions = getAllQuestions(game.questionTypesSelected);	
 	}
 
-	function iterateThroughTeams() { // This is my boiler plate to get everything out of teams
-		console.log(game.teams);
+	// function iterateThroughTeams() { // This is my boiler plate to get everything out of teams
+	// 	console.log(game.teams);
 
-		$.each(game.teams, function(key, value) {
-		  console.log("team: " + key);
-		  $.each(value, function (key, innerValue) {
-		  	console.log("team stats: " + key + " value: " + innerValue);
-		  });
-		});
-	}
+	// 	$.each(game.teams, function(key, value) {
+	// 	  console.log("team: " + key);
+	// 	  $.each(value, function (key, innerValue) {
+	// 	  	console.log("team stats: " + key + " value: " + innerValue);
+	// 	  });
+	// 	});
+	// }
 
-	iterateThroughTeams();
+	// iterateThroughTeams();
 
 	function beginGame(newGame) {
 		if (newGame) {
@@ -201,7 +202,7 @@ $(document).ready(function() {
 
 	function createTeams() {
 		console.log("Request received to create teams, this many: " + game.numberOfTeams);
-		$("#teamCreationScreen").removeClass("hidden"); // TODO move this?
+		//$("#teamCreationScreen").removeClass("hidden"); // TODO move this?
 
 		for (var i = 1; i <= game.numberOfTeams; i++) {
 			var teamExists = false;
@@ -231,9 +232,10 @@ $(document).ready(function() {
 				// TODO create and store team information here
 				game.teams = Object.assign(game.teams, newTeamObject);
 			}
+			else if (teamExists) {
+				console.log("@@@@@ looks like we're done making team" + [i] + " - time to start the game?")
+			}
 		}
-		console.log("FINAL FINAL FINAL FINAL FINAL");
-		console.log(game.teams);
 	}
 
 	function gradingRequired() {
@@ -241,7 +243,8 @@ $(document).ready(function() {
 			console.log("For Grading: " + game.round.answer.toLowerCase() + " VS " + game.round.answerToBeGraded.toLowerCase())
 			if (game.round.answer.toLowerCase() === game.round.answerToBeGraded.toLowerCase()) {
 				console.log("*****AMAZING!!!!  The answer was EXACTLY right! ***** (this will almost NEVER happen)");
-				updateScoreAndChangeTeam("correct");
+				updateScore("correct");
+				changeTeam();
 				$("#gradingScreen").addClass("hidden");
 				$("#scoreScreen").removeClass("hidden");
 			}
@@ -254,7 +257,8 @@ $(document).ready(function() {
 		}
 		else {
 			console.log("They didn't try very hard - answer was blank - it is WRONG");
-			updateScoreAndChangeTeam("noAnswer");
+			updateScore("noAnswer");
+			changeTeam();
 			$("#gradingScreen").addClass("hidden");
 			$("#scoreScreen").removeClass("hidden");
 		}
@@ -349,18 +353,19 @@ $(document).ready(function() {
 		// nuke the question so it can't be asked again until we reload the questions - decriment number of questions in game
 		delete gameQuestions[Object.keys(gameQuestions)[randomNumber]];
 		$(".displayRoundHere").html("Round " + game.currentQuestion + " of " + game.numberOfQuestions);
-
+		// TODO set the focus on the first input if availalb.e
 	}
 
 	function checkMultipleChoiceAnswer(clickedId) {
 		if (game.round.correctAnswerStoredIn == clickedId) {
 			console.log("looks like we have the correct answer!");
-			updateScoreAndChangeTeam("correct");
+			updateScore("correct");
 		}
 		else {
 			console.log("MC answer is incorrect: " + clickedId);
-			updateScoreAndChangeTeam("wrong");
+			updateScore("wrong");
 		}
+		changeTeam();
 		game.gameTimer.pause = true;
 		game.gameTimer.timer = 0;
 	}
@@ -385,7 +390,7 @@ $(document).ready(function() {
 		return numberOfQuestionsRemaining;
 	}
 
-	function updateScoreAndChangeTeam(scoreUpdate) {
+	function updateScore(scoreUpdate) {
 		console.log("We're on team: " + game.round.team + " score update is: " + scoreUpdate);
 
 		if (scoreUpdate == "correct") {
@@ -409,6 +414,10 @@ $(document).ready(function() {
 
 		// TODO change team - stub is below - it's not tested
 
+
+	}
+
+	function changeTeam() {
 		if (game.numberOfTeams > 1) {
 			// var currentTeam = game.round.team;
 			var nextTeam = "";
@@ -449,6 +458,7 @@ $(document).ready(function() {
 		//console.log("Unsorted array: " + returnArray);
 		shuffle(returnArray);
 		//console.log("Shuffled array: " + returnArray);
+		
 		return returnArray;
 	}
 
@@ -517,7 +527,15 @@ $(document).ready(function() {
   		game.numberOfQuestions = $("#numberOfQuestionsId").val();
   		game.roundMaxTime = $("#lengthOfRoundId").val();
 
+  		var countOfTeams = 0;
 
+  		$.each(game.teams, function(key, value) {
+				countOfTeams++;
+		});
+
+  		if (countOfTeams == game.numberOfTeams) {
+  			beginGame();
+  		}
 
   		if (game.numberOfTeams == 1 || game.numberOfTeams === 0) {
   			$("#setupScreen").addClass("hidden");
@@ -532,7 +550,8 @@ $(document).ready(function() {
   		}
   		else {
   			console.log("More then 1 team selected... we do something here");
-  			createTeams();
+  			$("#teamCreationScreen").removeClass("hidden");
+  			//createTeams();
   		}
 
   		$("input:checkbox[name=selectQuestionTypesCheckbox]:checked").each(function(){
@@ -544,7 +563,7 @@ $(document).ready(function() {
 	    		}
 	    	}
 		});
-  		beginGame(true);
+  		// TODO move this to an 'if we ahve all teams' beginGame(true);
     	return false;
 	}
 
@@ -601,13 +620,15 @@ $(document).ready(function() {
 
 	$("#correctAnswerButton").click(function () {
 		$("#gradingScreen").addClass("hidden");
-		updateScoreAndChangeTeam("correct");
+		updateScore("correct");
+		changeTeam();
 		$("#scoreScreen").removeClass("hidden");
 	});
 
 	$("#wrongAnswerButton").click(function () {
 		$("#gradingScreen").addClass("hidden");
-		updateScoreAndChangeTeam("wrong");
+		updateScore("wrong");
+		changeTeam();
 		$("#scoreScreen").removeClass("hidden");
 	});
 

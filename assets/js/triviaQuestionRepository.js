@@ -160,3 +160,6 @@ var availableQuestionsArray = 	[["General Questions Multiple Choice", generalQue
 								["General Questions Fill In The Blank", generalQuestionsFillInTheBlank],
 								["Geography Questions Multiple Choice", geographyQuestionsMultipleChoice],
 								["Geography Questions Fill In The Blank", geographyQuestionsFillInTheBlank]]
+
+// TODO make this array creation dynamic
+// TODO give this a count of question records so you can see how much each deck has in the UI

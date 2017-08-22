@@ -176,13 +176,11 @@ $(document).ready(function() {
 			newInput.setAttribute("class", "form-control");
 			newInput.setAttribute("class", "big-checkbox");
 			newInput.setAttribute("checked", true);
-			// newInput.setAttribute("disabled", true);
 		});
 	}
 
 	function createTeams() {
 		console.log("Request received to create teams, this many: " + game.numberOfTeams);
-		//$("#teamCreationScreen").removeClass("hidden"); // TODO move this?
 
 		for (var i = 1; i <= game.numberOfTeams; i++) {
 			var teamExists = false;
@@ -196,19 +194,18 @@ $(document).ready(function() {
 				}
 			});
 			if (!teamExists) {
-				console.log("*****Creating new team: team" + [i]);
+				console.log("*****Creating new team (empty shell): team" + [i]);
 				var newTeamName = "team" + [i];
 				var newTeamObject = {[newTeamName]: {
-										teamName:newTeamName, // TODO add
-										members:"Human 1, plus others?", // TODO add
-										correctAnswer:0, // TODO add
-										wrongAnswer:0, // TODO add
-										noAnswer:0, // TODO add
-										needTieBreaker:false // TODO add
+										teamName:newTeamName,
+										members:"Human 1, plus others?",
+										teamAssignedNameAndMembers:false,
+										correctAnswer:0,
+										wrongAnswer:0,
+										noAnswer:0,
+										needTieBreaker:false
 									}
 				}
-				// console.log(game.teams);
-				// console.log(newTeamObject);
 				game.teams = Object.assign(game.teams, newTeamObject);
 				// creating empty shell teams - these will be populated later with actual user data
 			}
@@ -218,41 +215,70 @@ $(document).ready(function() {
 		}
 	}
 
-	function assignTeamNameAndMembers() {
-		// create starter spot for team members (users can add more by clicking)
+	function setupTeamNameAndMembers() {
 		addTeamMemberInput();
-		// TODO rotate through teams
-		console.log("Time to grab information and put it into the team");
 
-		var teamNumber = "team1"
-		console.log("We are working on: " + teamNumber + " which is stored as follows: ");
-		console.log(game.teams[teamNumber]);
+		var teamNumber;
+
+		$.each(game.teams, function(key, value) {
+			teamNumber = "";
+			console.log("key: " + key + " value: " + value);
+			if (value.teamAssignedNameAndMembers == false) {
+				teamNumber = key;
+				console.log("Current Team: " + teamNumber);
+				
+				return false;
+			}
+		});
+
+		if (teamNumber != "") {
+			assignTeamNameAndMembers(teamNumber);
+		}
+		else if (teamNumber == "") {
+			console.log("no more teams to assign - we close this window and back to the other? for reference:");
+			console.log(game.teams)
+			$("#teamCreationScreen").addClass("hidden");
+			$("#numberOfTeams").prop("disabled", true);
+		}
+		else {
+			console.log("Something happened with setup team name and members")
+		}
+	}
+
+	function assignTeamNameAndMembers(teamNumber) {
+		$("#creatingThisTeam").html("Creating: " + teamNumber);
+		// console.log("We are working on: " + teamNumber + " which is stored as follows: ");
+		// console.log(game.teams[teamNumber]);
 
 		game.teams[teamNumber].teamName = $("#teamName").val();
 
-		$.each($(".teamMember"))
-			game.teams[teamNumber].teamMember += $(this).val();
-			if ((this).val() != "") {
-				game.teams[teamNumber] += ", ";
+		$('.teamMember').each(function(key, input) {
+	    // console.log("Key: " + key + " value: " + input.value);
+	    // console.log(input.value);
+        game.teams[teamNumber].members += input.value
+        console.log(game.teams[teamNumber].members)
+			if (input.value != "") {
+				game.teams[teamNumber].members += ", ";
 			}
+		});
 
+		game.teams[teamNumber].teamAssignedNameAndMembers = true;
 		console.log("Final team is: ");
 		console.log(game.teams[teamNumber]);
 	}
 
-	function addTeamMemberInput () {
-		console.log("adding member input")
+	function addTeamMemberInput() {
+		// console.log("adding member input")
 		var targetParent = $("#teamMembersDiv")
 		var newRow = document.createElement("row");
 		var newDiv = document.createElement("div");
 		var newInput = document.createElement("input");
 		newInput.type = "text";
-		newInput.setAttribute = ("class", "teamMember");
+		newInput.classList.add("teamMember");
+		newInput.classList.add("form-control");
 		targetParent.append(newRow);
 		newRow.append(newDiv);
 		newDiv.append(newInput);
-		newInput.setAttribute("class", "form-control");
-
 	}
 
 	function gradingRequired() {
@@ -412,15 +438,12 @@ $(document).ready(function() {
 		console.log("We're on team: " + game.round.team + " score update is: " + scoreUpdate);
 
 		if (scoreUpdate == "correct") {
-			console.log(game.round.team + " logged answer correct!");
 			game.teams[game.round.team].correctAnswer++;
 		}
 		else if (scoreUpdate == "wrong") {
-			console.log(game.round.team + " logged answer wrong!");
 			game.teams[game.round.team].wrongAnswer++;
 		}
 		else if (scoreUpdate == "noAnswer") {
-			console.log(game.round.team + " logged no answer!");
 			game.teams[game.round.team].noAnswer++
 		}
 
@@ -430,7 +453,7 @@ $(document).ready(function() {
 		$("#numberNoAnswerHere").html("No Answer: " + game.teams[game.round.team].noAnswer);
 		console.log("answer to be graded: >" + game.round.answerToBeGraded + "< or >" + game.round.needsToBeGraded + "<");
 
-		// TODO change team - stub is below - it's not tested
+		// TODO show all teams?  We'll have to at the end?  Might as well each round?
 
 
 	}
@@ -532,7 +555,7 @@ $(document).ready(function() {
 		}
 
 	function processSetupSubmit(e) { // nabbed from: https://stackoverflow.com/questions/5384712/capture-a-form-submit-in-javascript
-    if (e.preventDefault) e.preventDefault();
+        if (e.preventDefault) e.preventDefault();
 
     	// this grabs our checkboxes for questions - will be used to begin game below
   		$("input:checkbox[name=selectQuestionTypesCheckbox]:checked").each(function(){
@@ -552,47 +575,48 @@ $(document).ready(function() {
   		game.numberOfQuestions = $("#numberOfQuestionsId").val();
   		game.roundMaxTime = $("#lengthOfRoundId").val();
 
-  		var countOfTeams = 0;
+  		var countOfTeamsAssignedNameAndMembers = 0;
   		$.each(game.teams, function(key, value) {
-				countOfTeams++;
-				console.log("Count of Teams: " + countOfTeams)
+				if (value.teamAssignedNameAndMembers == true) {
+					countOfTeamsAssignedNameAndMembers++;
+				}
 		});
 
-  		if (countOfTeams == game.numberOfTeams && game.numberOfTeams != 0) {
+  		if (countOfTeamsAssignedNameAndMembers == game.numberOfTeams && game.numberOfTeams != 0) {
   			beginGame(true);
-  		}
-
-  		if (game.numberOfTeams == 1 || game.numberOfTeams == 0) {
-  			console.log("we have 0 or 1 as our team request...")
-  			$("#setupScreen").addClass("hidden");
-  			game.numberOfTeams = 1;
-  			createTeams(); // creates the single shell team with a generic name
-  			beginGame(true);
-  		}
-  		else if (game.numberOfTeams < 0) {
-  			// TODO handle if it's not a number as well
-  			console.log("So... uhh... negative teams huh?");
-  			alert ("Try a better number for teams, eh?");
-  			return false;
   		}
   		else {
-  			console.log("More then 1 team selected... let's create teams");
-  			$("#teamCreationScreen").removeClass("hidden");
-  			createTeams();
-  		}
+	  		if (game.numberOfTeams == 1 || game.numberOfTeams == 0) {
+	  			console.log("we have 0 or 1 as our team request...")
+	  			$("#setupScreen").addClass("hidden");
+	  			game.numberOfTeams = 1;
+	  			createTeams(); // creates the single shell team with a generic name
+	  			beginGame(true);
+	  		}
+	  		else if (game.numberOfTeams < 0) {
+	  			// TODO handle if it's not a number as well
+	  			console.log("So... uhh... negative teams huh?");
+	  			alert ("Try a better number for teams, eh?");
+	  			return false;
+	  		}
+	  		else {
+	  			console.log("More then 1 team selected... let's create teams");
+	  			$("#teamCreationScreen").removeClass("hidden");
+	  			createTeams();
+	  			setupTeamNameAndMembers();
+	  		}
+	  	}
 
   		// TODO force this to be numeric - ideally ranged 1-99
-
-
     	return false;
 	}
 
-	var form = document.getElementById('setupForm'); // source nabbed from: https://stackoverflow.com/questions/5384712/capture-a-form-submit-in-javascript
-		if (form.attachEvent) {
-    		form.attachEvent("submit", processSetupSubmit);
+    var setupForm = document.getElementById('setupForm'); // source nabbed from: https://stackoverflow.com/questions/5384712/capture-a-form-submit-in-javascript
+    if (setupForm.attachEvent) {
+            setupForm.attachEvent("submit", processSetupSubmit);
 		} 
 		else {
-	    	form.addEventListener("submit", processSetupSubmit);
+            setupForm.addEventListener("submit", processSetupSubmit);
 		}
 
 	$("#scoreScreen").click(function () {
@@ -623,6 +647,7 @@ $(document).ready(function() {
 		initializeGame();
 		$(".gameOver").addClass("hidden");
 		$("#scoreScreen").addClass("hidden");
+		$("#numberOfTeams").prop("disabled", false);
 		$("#setupScreen").removeClass("hidden");
 	});
 
@@ -651,8 +676,13 @@ $(document).ready(function() {
 	});
 
 	$("#teamCreationButton").click(function () {
-		$("#teamCreationScreen").addClass("hidden");
-		assignTeamNameAndMembers(); 
+		$("#teamName").html("");
+		$("#teamMembersDiv").empty();
+		setupTeamNameAndMembers();
 		console.log(game.teams)
+	});
+
+	$("#clickToAddTeamMember").click(function () {
+		addTeamMemberInput();
 	});
 });

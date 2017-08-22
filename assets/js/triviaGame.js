@@ -207,20 +207,20 @@ $(document).ready(function() {
 										needTieBreaker:false // TODO add
 									}
 				}
-				console.log(game.teams);
-				console.log(newTeamObject);
+				// console.log(game.teams);
+				// console.log(newTeamObject);
 				game.teams = Object.assign(game.teams, newTeamObject);
 				// creating empty shell teams - these will be populated later with actual user data
 			}
 			else if (teamExists) {
-				console.log("@@@@@ looks like we're done making team" + [i] + " - time to start the game?")
+				console.log("Looks like we had a pre-filled team" + [i] + " - check on this (why wasn't it cleared out)?")
 			}
 		}
 	}
 
 	function assignTeamNameAndMembers() {
 		// create starter spot for team members (users can add more by clicking)
-		createTeamMemberInput();
+		addTeamMemberInput();
 		// TODO rotate through teams
 		console.log("Time to grab information and put it into the team");
 
@@ -240,7 +240,7 @@ $(document).ready(function() {
 		console.log(game.teams[teamNumber]);
 	}
 
-	function createTeamMemberInput () {
+	function addTeamMemberInput () {
 		console.log("adding member input")
 		var targetParent = $("#teamMembersDiv")
 		var newRow = document.createElement("row");
@@ -533,41 +533,8 @@ $(document).ready(function() {
 
 	function processSetupSubmit(e) { // nabbed from: https://stackoverflow.com/questions/5384712/capture-a-form-submit-in-javascript
     if (e.preventDefault) e.preventDefault();
-    	if ($("#numberOfTeams").val() != "") {
-  			game.numberOfTeams = $("#numberOfTeams").val();
-		}
-  		game.numberOfQuestions = $("#numberOfQuestionsId").val();
-  		game.roundMaxTime = $("#lengthOfRoundId").val();
 
-  		var countOfTeams = 0;
-
-  		$.each(game.teams, function(key, value) {
-				countOfTeams++;
-		});
-
-  		if (countOfTeams == game.numberOfTeams) {
-  			beginGame();
-  		}
-
-  		if (game.numberOfTeams == 1 || game.numberOfTeams === 0) {
-  			$("#setupScreen").addClass("hidden");
-  			// TODO create a single team here automagically (or prompt?)
-			
-  		}
-  		else if (game.numberOfTeams < 0) {
-  			// TODO handle if it's not a number as well
-  			console.log("So... uhh... negative teams huh?");
-  			alert ("Try a better number for teams, eh?");
-  			return false;
-  		}
-  		else {
-  			console.log("More then 1 team selected... we do something here");
-  			$("#teamCreationScreen").removeClass("hidden");
-  			createTeams();
-  		}
-
-  		// TODO force this to be numeric - ideally ranged 1-99
-
+    	// this grabs our checkboxes for questions - will be used to begin game below
   		$("input:checkbox[name=selectQuestionTypesCheckbox]:checked").each(function(){
   			var thisQuestionArrayItem = [] 
   			for (var i = 0; i < availableQuestionsArray.length; i++) {
@@ -577,6 +544,46 @@ $(document).ready(function() {
 	    		}
 	    	}
 		});
+
+
+    	if ($("#numberOfTeams").val() != "") {
+  			game.numberOfTeams = $("#numberOfTeams").val();
+		}
+  		game.numberOfQuestions = $("#numberOfQuestionsId").val();
+  		game.roundMaxTime = $("#lengthOfRoundId").val();
+
+  		var countOfTeams = 0;
+  		$.each(game.teams, function(key, value) {
+				countOfTeams++;
+				console.log("Count of Teams: " + countOfTeams)
+		});
+
+  		if (countOfTeams == game.numberOfTeams && game.numberOfTeams != 0) {
+  			beginGame(true);
+  		}
+
+  		if (game.numberOfTeams == 1 || game.numberOfTeams == 0) {
+  			console.log("we have 0 or 1 as our team request...")
+  			$("#setupScreen").addClass("hidden");
+  			game.numberOfTeams = 1;
+  			createTeams(); // creates the single shell team with a generic name
+  			beginGame(true);
+  		}
+  		else if (game.numberOfTeams < 0) {
+  			// TODO handle if it's not a number as well
+  			console.log("So... uhh... negative teams huh?");
+  			alert ("Try a better number for teams, eh?");
+  			return false;
+  		}
+  		else {
+  			console.log("More then 1 team selected... let's create teams");
+  			$("#teamCreationScreen").removeClass("hidden");
+  			createTeams();
+  		}
+
+  		// TODO force this to be numeric - ideally ranged 1-99
+
+
     	return false;
 	}
 

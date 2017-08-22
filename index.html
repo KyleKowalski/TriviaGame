@@ -38,7 +38,7 @@
 		<hr class="clear-both">
 		<form id="setupForm" class="form-inline">
 			<row><h4>How many teams do you want to create?</h4></row>
-			<row><input value="3" id="numberOfTeams" autocomplete="off" class="form-control" placeholder="Enter an integer: no entry will start the game with 1 team"></row>
+			<row><input value="0" id="numberOfTeams" autocomplete="off" class="form-control" placeholder="Enter an integer: no entry will start the game with 1 team"></row>
 			<hr>
 			<row><h4>Game Variables:</h4></row>
 			<row><h5 class="col-xs-6 col-sm-6 col-md-6 col-lg-6">Number of questions (per team):</h5></row>
@@ -59,6 +59,7 @@
 	</container>
 	<container id="teamCreationScreen" class="hidden absoluteForTeams text-center">
 		<form id="teamCreationForm" class="form-inline">
+			<row><h1 id="creatingThisTeam"></h1></row>
 			<row><h1 id="teamName">Team Name:</h1></row>
 			<row><input id="teamName" autocomplete="off" placeholder="Enter your teams name here:" class="form-control"></row>
 			<hr>

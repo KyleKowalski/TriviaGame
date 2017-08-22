@@ -53,7 +53,6 @@ $(document).ready(function() {
 				},
 				count: function() {
 					console.log("COUNT: call using: "  + game.gameTimer.timer + " clock running is: " + game.gameTimer.clockRunning + " paused: " + game.gameTimer.pause);
-					// console.log("game current question: " + game.currentQuestion + " game number of questions: " + game.numberOfQuestions);
 
 					if (game.gameTimer.pause) {
 						console.log("game is paused for something...?");
@@ -89,9 +88,7 @@ $(document).ready(function() {
   				},
   				nextQuestion: function() {
   					game.gameTimer.stop();
-  					// console.log("@#$%@#$%@#$%@#$% adding to current question +1 from: " + game.currentQuestion);
   					game.currentQuestion++;
-  					// console.log("@#$%@#$%@#$%@#$% adding to current question +1 to: " + game.currentQuestion);
   					getOneRandomQuestionAndRemoveItFromPool();
   					game.gameTimer.start();
   				},
@@ -111,23 +108,6 @@ $(document).ready(function() {
   				}
   			},
   			teams: {
-				team1: { // TODO dynamically create me
-					teamName:"Team Human", // TODO add
-					members:"Kyle", // TODO add
-					correctAnswer:0, // TODO add
-					wrongAnswer:0, // TODO add
-					noAnswer:0, // TODO add
-					needTieBreaker:false // TODO add
-				},
-				
-				team2: { // TODO dynamically create me 
-					teamName:"Team Bot", // TODO add
-					members:"Robot", // TODO add
-					correctAnswer:0, // TODO add
-					wrongAnswer:0, // TODO add
-					noAnswer:0, // TODO add
-					needTieBreaker:false // TODO add
-				}
 			}
 		}
 		createCheckboxArrayForQuestionTypes();
@@ -186,7 +166,7 @@ $(document).ready(function() {
 			newInput.name = "selectQuestionTypesCheckbox";
 			newInput.id = item[0];
 			newInput.value = item[0];
-			newLabel.for = item;
+			newLabel.for = item[0];
 			newLabel.innerHTML = item[0];
 			targetParent.append(newRow);
 			newRow.append(newDiv);
@@ -219,23 +199,60 @@ $(document).ready(function() {
 				console.log("*****Creating new team: team" + [i]);
 				var newTeamName = "team" + [i];
 				var newTeamObject = {[newTeamName]: {
-										teamName:"", // TODO add
-										members:"", // TODO add
+										teamName:newTeamName, // TODO add
+										members:"Human 1, plus others?", // TODO add
 										correctAnswer:0, // TODO add
 										wrongAnswer:0, // TODO add
 										noAnswer:0, // TODO add
 										needTieBreaker:false // TODO add
 									}
 				}
+				console.log(game.teams);
 				console.log(newTeamObject);
-				// $("#teamName").html("Team " + [i] + " Name:");
-				// TODO create and store team information here
 				game.teams = Object.assign(game.teams, newTeamObject);
+				// creating empty shell teams - these will be populated later with actual user data
 			}
 			else if (teamExists) {
 				console.log("@@@@@ looks like we're done making team" + [i] + " - time to start the game?")
 			}
 		}
+	}
+
+	function assignTeamNameAndMembers() {
+		// create starter spot for team members (users can add more by clicking)
+		createTeamMemberInput();
+		// TODO rotate through teams
+		console.log("Time to grab information and put it into the team");
+
+		var teamNumber = "team1"
+		console.log("We are working on: " + teamNumber + " which is stored as follows: ");
+		console.log(game.teams[teamNumber]);
+
+		game.teams[teamNumber].teamName = $("#teamName").val();
+
+		$.each($(".teamMember"))
+			game.teams[teamNumber].teamMember += $(this).val();
+			if ((this).val() != "") {
+				game.teams[teamNumber] += ", ";
+			}
+
+		console.log("Final team is: ");
+		console.log(game.teams[teamNumber]);
+	}
+
+	function createTeamMemberInput () {
+		console.log("adding member input")
+		var targetParent = $("#teamMembersDiv")
+		var newRow = document.createElement("row");
+		var newDiv = document.createElement("div");
+		var newInput = document.createElement("input");
+		newInput.type = "text";
+		newInput.setAttribute = ("class", "teamMember");
+		targetParent.append(newRow);
+		newRow.append(newDiv);
+		newDiv.append(newInput);
+		newInput.setAttribute("class", "form-control");
+
 	}
 
 	function gradingRequired() {
@@ -282,6 +299,7 @@ $(document).ready(function() {
 			alert("No more questions available to be asked - so... we need to do something else");
 			// TODO prompt for a question deck reload?
 			game.outOfQuestions = true;
+			game.gameTimer.stop();
 			return false;
 		}
 		var randomNumber = Math.floor(Math.random() * numberOfQuestionsRemaining);
@@ -419,7 +437,6 @@ $(document).ready(function() {
 
 	function changeTeam() {
 		if (game.numberOfTeams > 1) {
-			// var currentTeam = game.round.team;
 			var nextTeam = "";
 
 			// TODO requires significant amounts of testing.
@@ -441,8 +458,6 @@ $(document).ready(function() {
 					}
 				}
 			}
-
-
 		}
 		else {
 			console.log("We have only 1 team - so no need to change anything");
@@ -452,12 +467,9 @@ $(document).ready(function() {
 	function createAndShuffleRandomNumberArray(number) {
 		var returnArray = [];
 		for (var i = 1; i <= number; i++){
-			//console.log("numbers to array: " + i)
 			returnArray.push(i);
 		}
-		//console.log("Unsorted array: " + returnArray);
 		shuffle(returnArray);
-		//console.log("Shuffled array: " + returnArray);
 		
 		return returnArray;
 	}
@@ -551,8 +563,10 @@ $(document).ready(function() {
   		else {
   			console.log("More then 1 team selected... we do something here");
   			$("#teamCreationScreen").removeClass("hidden");
-  			//createTeams();
+  			createTeams();
   		}
+
+  		// TODO force this to be numeric - ideally ranged 1-99
 
   		$("input:checkbox[name=selectQuestionTypesCheckbox]:checked").each(function(){
   			var thisQuestionArrayItem = [] 
@@ -563,7 +577,6 @@ $(document).ready(function() {
 	    		}
 	    	}
 		});
-  		// TODO move this to an 'if we ahve all teams' beginGame(true);
     	return false;
 	}
 
@@ -576,8 +589,6 @@ $(document).ready(function() {
 		}
 
 	$("#scoreScreen").click(function () {
-		// console.log("request received to dismiss score screen and continue");
-		console.log("validating... current question num: " + game.currentQuestion + " >= " + game.numberOfQuestions + "?  if no, keep going")
 		$(".displayRoundHere").html("Round " + game.currentQuestion + " of " + game.numberOfQuestions);
 		if (game.currentQuestion >= game.numberOfQuestions) {
 			console.log("Click to continue:  No, game is over!");
@@ -633,9 +644,8 @@ $(document).ready(function() {
 	});
 
 	$("#teamCreationButton").click(function () {
-		console.log("clicked 'go' for team creation - starting")
 		$("#teamCreationScreen").addClass("hidden");
-		createTeams();
+		assignTeamNameAndMembers(); 
+		console.log(game.teams)
 	});
-
 });

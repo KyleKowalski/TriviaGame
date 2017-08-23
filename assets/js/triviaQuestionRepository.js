@@ -55,7 +55,7 @@ var generalQuestionsMultipleChoice = {
 
 var generalQuestionsFillInTheBlank = {
 	genfitb1: {
-		question:"What controverial novel begins and ends with the title characters name",
+		question:"What controversial novel begins and ends with the title characters name",
 		answer:"Lolita",
 		showBlanks:1,
 		type:"fitb"
@@ -132,7 +132,7 @@ var geographyQuestionsMultipleChoice = {
 		fakeAnswer3:"95%"
 	},
 	geomc5: {
-		question:"Which city does not have an official Disneyland/world?",
+		question:"Which city does not have an official Disneyland/World?",
 		answer:"Moscow",
 		type:"mc",
 		fakeAnswer1:"Tokyo",
@@ -160,3 +160,6 @@ var availableQuestionsArray = 	[["General Questions Multiple Choice", generalQue
 								["General Questions Fill In The Blank", generalQuestionsFillInTheBlank],
 								["Geography Questions Multiple Choice", geographyQuestionsMultipleChoice],
 								["Geography Questions Fill In The Blank", geographyQuestionsFillInTheBlank]]
+
+// TODO make this array creation dynamic
+// TODO give this a count of question records so you can see how much each deck has in the UI

@@ -21,6 +21,7 @@ $(document).ready(function() {
 			roundMaxTime:0, // assume seconds - no infinite, but give users ability to set at 'high' (nearly unlimited) number
 			round: {
 				team:"team1",
+				roundNumber:1,
 				question:"",
 				answer:"",
 				type:"",
@@ -134,6 +135,7 @@ $(document).ready(function() {
 	// iterateThroughTeams();
 
 	function beginGame(newGame) {
+		game.round.team = "team1"; //resets team to team1 (from setup earlier)
 		if (newGame) {
 			console.log("getting new questions");
 			getQuestionsForGame();
@@ -273,15 +275,13 @@ $(document).ready(function() {
 	}
 
 	function addTeamMemberInput() {
-		// console.log("adding member input")
 		var targetParent = $("#teamMembersDiv")
 		var newRow = document.createElement("row");
 		var newDiv = document.createElement("div");
 		var newInput = document.createElement("input");
 		newInput.type = "text";
 		newInput.classList.add("teamMember");
-		// newInput.classList.add("form-control");
-		// newInput.value = "Randy Random"; // TODO don't really like adding this... 
+		newInput.classList.add("form-control");
 		targetParent.append(newRow);
 		newRow.append(newDiv);
 		newDiv.append(newInput);
@@ -289,23 +289,19 @@ $(document).ready(function() {
 
 	function gradingRequired() {
 		if (game.round.answerToBeGraded !== "") {
-			console.log("For Grading: " + game.round.answer.toLowerCase() + " VS " + game.round.answerToBeGraded.toLowerCase())
 			if (game.round.answer.toLowerCase() === game.round.answerToBeGraded.toLowerCase()) {
-				console.log("*****AMAZING!!!!  The answer was EXACTLY right! ***** (this will almost NEVER happen)");
 				updateScore("correct");
 				changeTeam();
 				$("#gradingScreen").addClass("hidden");
 				$("#scoreScreen").removeClass("hidden");
 			}
 			else {
-				console.log("Manual grading required!");
 				$("#previousQuestionHere").html(game.round.question);
 				$("#previousAnswerHere").html(game.round.answer);
 				$("#answerToBeGradedHere").html(game.round.answerToBeGraded);
 			}  
 		}
 		else {
-			console.log("They didn't try very hard - answer was blank - it is WRONG");
 			updateScore("noAnswer");
 			changeTeam();
 			$("#gradingScreen").addClass("hidden");
@@ -336,6 +332,8 @@ $(document).ready(function() {
 		}
 		var randomNumber = Math.floor(Math.random() * numberOfQuestionsRemaining);
 		game.round.question = gameQuestions[Object.keys(gameQuestions)[randomNumber]].question;
+		console.log("$%%%%%%%%%%%%%%%%%%%%");
+		console.log(gameQuestions);
 		$("#question").html("<h1>" + game.round.question + "</h1>");
 		game.round.answer = gameQuestions[Object.keys(gameQuestions)[randomNumber]].answer;
 
@@ -402,7 +400,7 @@ $(document).ready(function() {
 		}
 		// nuke the question so it can't be asked again until we reload the questions - decriment number of questions in game
 		delete gameQuestions[Object.keys(gameQuestions)[randomNumber]];
-		$(".displayRoundHere").html("Round " + game.currentQuestion + " of " + game.numberOfQuestions);
+		$(".displayRoundHere").html(game.round.team + "<br>Round " + game.round.roundNumber + " of " + game.numberOfQuestions);
 		// TODO set the focus on the first input if availalb.e
 	}
 
@@ -589,6 +587,7 @@ $(document).ready(function() {
 		});
 
   		if (countOfTeamsAssignedNameAndMembers == game.numberOfTeams && game.numberOfTeams != 0) {
+  			$("#setupScreen").addClass("hidden");
   			beginGame(true);
   		}
   		else {
@@ -625,7 +624,7 @@ $(document).ready(function() {
 		}
 
 	$("#scoreScreen").click(function () {
-		$(".displayRoundHere").html("Round " + game.currentQuestion + " of " + game.numberOfQuestions);
+		$(".displayRoundHere").html(game.round.team + "<br>Round " + game.round.roundNumber + " of " + game.numberOfQuestions);
 		if (game.currentQuestion >= game.numberOfQuestions) {
 			console.log("Click to continue:  No, game is over!");
 			$(".gameOver").removeClass("hidden");	

@@ -259,6 +259,7 @@ $(document).ready(function() {
 		newInput.type = "text";
 		newInput.classList.add("teamMember");
 		newInput.classList.add("form-control");
+		newInput.setAttribute("autocomplete", "off");
 		targetParent.append(newRow);
 		newRow.append(newDiv);
 		newDiv.append(newInput);
@@ -354,6 +355,7 @@ $(document).ready(function() {
 				newRow.append(newDiv);
 				newDiv.append(newInput);
 				newInput.setAttribute("class", "form-control");
+				newInput.setAttribute("autocomplete", "off");
 			}
 			game.round.needsToBeGraded = true;
 			game.round.answerToBeGraded = "";
@@ -398,7 +400,6 @@ $(document).ready(function() {
 	}
 
 	function updateScore(scoreUpdate) {
-		console.log("We're on team: " + game.round.team + " score update is: " + scoreUpdate);
 
 		if (scoreUpdate == "correct") {
 			game.teams[game.round.team].correctAnswer++;
@@ -429,24 +430,20 @@ $(document).ready(function() {
 			var teamFound = false;
 
 			for (var key in game.teams) {
-				console.log("looking for:" + game.round.team + " got: " + key);
 				if (key == game.round.team) {
-					console.log("We found this team - now we need the next team");
 					teamFound = true;
 				}
 				else if (teamFound) {
 					game.round.team = key;
 					nextTeam = key;
-					console.log("Next team is: " + game.round.team);
 					return false; // break out if we find our next team
 				}
 				else {
-					console.log("These aren't the droids we're looking for... - looking for"  + game.round.team + " got: " + key);
+					// console.log("These aren't the droids we're looking for... - looking for"  + game.round.team + " got: " + key);
 				}
 			}
 			console.log("Team Found: " + teamFound + " next team: " + nextTeam)
 			if (nextTeam == "") {
-				console.log("Back to team 1 since we didn't find a higher teamNumber");
 				game.round.team = "team1";
 				game.round.roundNumber++;
 			}
@@ -617,10 +614,10 @@ $(document).ready(function() {
 		$("#setupScreen").removeClass("hidden");
 	});
 
-	$("#stopHere").click(function () {
+	$("#stopHere").click(function () { // useful for testing - will remove when we're done, done
 		game.gameTimer.stop();
-		// console.log("global stop for testing purposes - will be removed later");
-		// console.log(game.teams)
+		console.log("global stop for testing purposes - will be removed later");
+		console.log(game.teams)
 		console.log(game.round.team)
 		console.log("round: "+ game.round.roundNumber);
 	});

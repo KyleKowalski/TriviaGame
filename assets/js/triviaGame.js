@@ -218,25 +218,22 @@ $(document).ready(function() {
 	function setupTeamNameAndMembers() {
 		addTeamMemberInput();
 
-		var teamNumber;
+		var teamNumber = "";
 
 		$.each(game.teams, function(key, value) {
-			teamNumber = "";
-			console.log("key: " + key + " value: " + value);
-			if (value.teamAssignedNameAndMembers == false) {
+			if (value.teamAssignedNameAndMembers === false) {
 				teamNumber = key;
-				console.log("Current Team: " + teamNumber);
-				
-				return false;
+				return false; // this allows teams to be filled in order (team1, team2, etc)
 			}
 		});
+		
+		$("#teamName").val(teamNumber);
+		$("#creatingThisTeam").html("Creating: " + teamNumber);
 
 		if (teamNumber != "") {
-			assignTeamNameAndMembers(teamNumber);
+			game.round.team = teamNumber;
 		}
 		else if (teamNumber == "") {
-			console.log("no more teams to assign - we close this window and back to the other? for reference:");
-			console.log(game.teams)
 			$("#teamCreationScreen").addClass("hidden");
 			$("#numberOfTeams").prop("disabled", true);
 		}
@@ -245,23 +242,31 @@ $(document).ready(function() {
 		}
 	}
 
-	function assignTeamNameAndMembers(teamNumber) {
-		$("#creatingThisTeam").html("Creating: " + teamNumber);
-		// console.log("We are working on: " + teamNumber + " which is stored as follows: ");
-		// console.log(game.teams[teamNumber]);
+	function assignTeamNameAndMembers() {
+		var teamNumber = game.round.team;
+		game.teams[teamNumber].members = "";
+		
+		var thisTeamName = $("#teamName").val();
+		console.log("Team Name: " + thisTeamName);
 
-		game.teams[teamNumber].teamName = $("#teamName").val();
+		if (thisTeamName != "") {
+			game.teams[teamNumber].teamName = thisTeamName
+		}
+		else {
+			alert("Team name was blank, you will be given team name: " + teamNumber);
+		}
 
-		$('.teamMember').each(function(key, input) {
-	    // console.log("Key: " + key + " value: " + input.value);
-	    // console.log(input.value);
-        game.teams[teamNumber].members += input.value
-        console.log(game.teams[teamNumber].members)
-			if (input.value != "") {
+		$(".teamMember").each(function() {
+			var thisOne = $(this).val();
+    		console.log("this one... is...")
+    		console.log(thisOne);
+			game.teams[teamNumber].members += thisOne;
+			console.log("Current team members: " + game.teams[teamNumber].members);
+			if (thisOne != "") {
 				game.teams[teamNumber].members += ", ";
 			}
 		});
-
+		game.teams[teamNumber].members = game.teams[teamNumber].members.replace(/,\s*$/, ""); // remove any trailing garbage
 		game.teams[teamNumber].teamAssignedNameAndMembers = true;
 		console.log("Final team is: ");
 		console.log(game.teams[teamNumber]);
@@ -275,7 +280,8 @@ $(document).ready(function() {
 		var newInput = document.createElement("input");
 		newInput.type = "text";
 		newInput.classList.add("teamMember");
-		newInput.classList.add("form-control");
+		// newInput.classList.add("form-control");
+		// newInput.value = "Randy Random"; // TODO don't really like adding this... 
 		targetParent.append(newRow);
 		newRow.append(newDiv);
 		newDiv.append(newInput);
@@ -606,7 +612,6 @@ $(document).ready(function() {
 	  			setupTeamNameAndMembers();
 	  		}
 	  	}
-
   		// TODO force this to be numeric - ideally ranged 1-99
     	return false;
 	}
@@ -653,7 +658,9 @@ $(document).ready(function() {
 
 	$("#stopHere").click(function () {
 		game.gameTimer.stop();
-		console.log("global stop for testing purposes - will be removed later")
+		// console.log("global stop for testing purposes - will be removed later");
+		// console.log(game.teams)
+		console.log(game.round.team)
 	});
 
 	$(".mc").click(function (event) {
@@ -676,10 +683,10 @@ $(document).ready(function() {
 	});
 
 	$("#teamCreationButton").click(function () {
+		assignTeamNameAndMembers();
 		$("#teamName").html("");
 		$("#teamMembersDiv").empty();
 		setupTeamNameAndMembers();
-		console.log(game.teams)
 	});
 
 	$("#clickToAddTeamMember").click(function () {

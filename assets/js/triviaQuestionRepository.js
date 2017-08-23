@@ -55,7 +55,7 @@ var generalQuestionsMultipleChoice = {
 
 var generalQuestionsFillInTheBlank = {
 	genfitb1: {
-		question:"What controverial novel begins and ends with the title characters name",
+		question:"What controversial novel begins and ends with the title characters name",
 		answer:"Lolita",
 		showBlanks:1,
 		type:"fitb"

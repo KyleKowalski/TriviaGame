@@ -22,6 +22,7 @@ $(document).ready(function() {
 			round: {
 				team:"team1",
 				roundNumber:1,
+				// questionNumber:1,
 				question:"",
 				answer:"",
 				type:"",
@@ -38,14 +39,13 @@ $(document).ready(function() {
 				clockRunning:false,
 				pause:false,
 				start: function() {
-					console.log("****starting game timer called using : " + game.gameTimer.timer + " and clock is running: " + game.gameTimer.clockRunning + "*****")
 					if (!game.gameTimer.clockRunning) {
 						game.gameTimer.resetClock();
         				game.timeInterval = setInterval(game.gameTimer.count, 1000);
         				game.gameTimer.clockRunning = true;
       				}
       				else if (game.gameTimer.clockRunning) {
-      					console.log("GameTimer Start was called with clock running - this is baaaddd mmmmkay");
+      					console.log("GameTimer Start was called with clock running - this is baaaddd mmmmkay, fix it.");
       				}
   				},
 				stop: function() {
@@ -53,10 +53,10 @@ $(document).ready(function() {
     				game.gameTimer.clockRunning = false;
 				},
 				count: function() {
-					console.log("COUNT: call using: "  + game.gameTimer.timer + " clock running is: " + game.gameTimer.clockRunning + " paused: " + game.gameTimer.pause);
+					// console.log("COUNT: call using: "  + game.gameTimer.timer + " clock running is: " + game.gameTimer.clockRunning + " paused: " + game.gameTimer.pause);
 
 					if (game.gameTimer.pause) {
-						console.log("game is paused for something...?");
+						// console.log("game is paused for something...?");
 					}
 					else if (!game.gameTimer.pause) {
 						$("#scoreScreen").addClass("hidden");
@@ -121,19 +121,6 @@ $(document).ready(function() {
 			gameQuestions = getAllQuestions(game.questionTypesSelected);	
 	}
 
-	// function iterateThroughTeams() { // This is my boiler plate to get everything out of teams
-	// 	console.log(game.teams);
-
-	// 	$.each(game.teams, function(key, value) {
-	// 	  console.log("team: " + key);
-	// 	  $.each(value, function (key, innerValue) {
-	// 	  	console.log("team stats: " + key + " value: " + innerValue);
-	// 	  });
-	// 	});
-	// }
-
-	// iterateThroughTeams();
-
 	function beginGame(newGame) {
 		game.round.team = "team1"; //resets team to team1 (from setup earlier)
 		if (newGame) {
@@ -182,8 +169,6 @@ $(document).ready(function() {
 	}
 
 	function createTeams() {
-		console.log("Request received to create teams, this many: " + game.numberOfTeams);
-
 		for (var i = 1; i <= game.numberOfTeams; i++) {
 			var teamExists = false;
 			$.each(game.teams, function(key, value) {
@@ -196,7 +181,6 @@ $(document).ready(function() {
 				}
 			});
 			if (!teamExists) {
-				console.log("*****Creating new team (empty shell): team" + [i]);
 				var newTeamName = "team" + [i];
 				var newTeamObject = {[newTeamName]: {
 										teamName:newTeamName,
@@ -247,9 +231,7 @@ $(document).ready(function() {
 	function assignTeamNameAndMembers() {
 		var teamNumber = game.round.team;
 		game.teams[teamNumber].members = "";
-		
 		var thisTeamName = $("#teamName").val();
-		console.log("Team Name: " + thisTeamName);
 
 		if (thisTeamName != "") {
 			game.teams[teamNumber].teamName = thisTeamName
@@ -260,18 +242,13 @@ $(document).ready(function() {
 
 		$(".teamMember").each(function() {
 			var thisOne = $(this).val();
-    		console.log("this one... is...")
-    		console.log(thisOne);
 			game.teams[teamNumber].members += thisOne;
-			console.log("Current team members: " + game.teams[teamNumber].members);
 			if (thisOne != "") {
 				game.teams[teamNumber].members += ", ";
 			}
 		});
 		game.teams[teamNumber].members = game.teams[teamNumber].members.replace(/,\s*$/, ""); // remove any trailing garbage
 		game.teams[teamNumber].teamAssignedNameAndMembers = true;
-		console.log("Final team is: ");
-		console.log(game.teams[teamNumber]);
 	}
 
 	function addTeamMemberInput() {
@@ -311,20 +288,17 @@ $(document).ready(function() {
 	}
 
 	function getOneRandomQuestionAndRemoveItFromPool() {
-		console.log("===== We're in get one question from pool: =====");
-
 		cleanUpForNextQuestion();
 
 		var numberOfQuestionsRemaining = getNumberOfQuestionsRemaining();
 
-		console.log("Questions remaining in game (after this one): " + (game.numberOfQuestions - game.currentQuestion) + " questions remaining to be asked: " + numberOfQuestionsRemaining);
 		if (numberOfQuestionsRemaining < (game.numberOfQuestions - game.currentQuestion)) {
 			// TODO need to handle this more gracefully
 			console.log("***** WARNING ***** not enough questions to finish the game");
 		}
 		if (numberOfQuestionsRemaining === 0) {
 			console.log("Well... we're out of cake... so your options are 'or death' --- game is over (we're out of questions).");
-			alert("No more questions available to be asked - so... we need to do something else");
+			alert("No more questions available to be asked - game is over");
 			// TODO prompt for a question deck reload?
 			game.outOfQuestions = true;
 			game.gameTimer.stop();
@@ -332,8 +306,6 @@ $(document).ready(function() {
 		}
 		var randomNumber = Math.floor(Math.random() * numberOfQuestionsRemaining);
 		game.round.question = gameQuestions[Object.keys(gameQuestions)[randomNumber]].question;
-		console.log("$%%%%%%%%%%%%%%%%%%%%");
-		console.log(gameQuestions);
 		$("#question").html("<h1>" + game.round.question + "</h1>");
 		game.round.answer = gameQuestions[Object.keys(gameQuestions)[randomNumber]].answer;
 
@@ -343,28 +315,20 @@ $(document).ready(function() {
 
 			game.round.correctAnswerStoredIn = "mcAnswer" + randomNumberArray[0];
 
-			// TODO modify these to be not present at start, but on click
+			// TODO modify these to do something fun on click (good and bad?)
 			// $("#mcAnswer" + randomNumberArray[0]).addClass("bg-success");
-			$("#mcAnswer" + randomNumberArray[1]).removeClass("bg-success");
-			$("#mcAnswer" + randomNumberArray[2]).removeClass("bg-success");
-			$("#mcAnswer" + randomNumberArray[3]).removeClass("bg-success");
-			// TODO REMOVE THE ABOVE LINES - this is just for testing
+			// $("#mcAnswer" + randomNumberArray[1]).removeClass("bg-success");
+			// $("#mcAnswer" + randomNumberArray[2]).removeClass("bg-success");
+			// $("#mcAnswer" + randomNumberArray[3]).removeClass("bg-success");
 
 			$("#mcAnswer" + randomNumberArray[0]).html(game.round.answer);
 			// TODO redo this where we can have more then 3x fake answers - more specifically, the assigned number of fake answers
-			// this allows us to handle both multiple guess and fill in the blank in the same function
 
-			//console.log("looks like a multple choice question - we need fake answers");
-
-			// if (gameQuestions[Object.keys(gameQuestions)[randomNumber]].fakeAnswer1) {
 			game.round.fakeAnswer1 = gameQuestions[Object.keys(gameQuestions)[randomNumber]].fakeAnswer1;
-			//console.log("fake answer1: " + game.round.fakeAnswer1);
 			$("#mcAnswer" + randomNumberArray[1]).html(game.round.fakeAnswer1);
 			game.round.fakeAnswer2 = gameQuestions[Object.keys(gameQuestions)[randomNumber]].fakeAnswer2
-			//console.log("fake answer2: " + game.round.fakeAnswer2);
 			$("#mcAnswer" + randomNumberArray[2]).html(game.round.fakeAnswer2);
 			game.round.fakeAnswer3 = gameQuestions[Object.keys(gameQuestions)[randomNumber]].fakeAnswer3;
-			// console.log("fake answer3: " + game.round.fakeAnswer3);
 			$("#mcAnswer" + randomNumberArray[3]).html(game.round.fakeAnswer3);
 
 			$("#fitb").addClass("hidden");
@@ -390,7 +354,6 @@ $(document).ready(function() {
 				newRow.append(newDiv);
 				newDiv.append(newInput);
 				newInput.setAttribute("class", "form-control");
-
 			}
 			game.round.needsToBeGraded = true;
 			game.round.answerToBeGraded = "";
@@ -401,16 +364,14 @@ $(document).ready(function() {
 		// nuke the question so it can't be asked again until we reload the questions - decriment number of questions in game
 		delete gameQuestions[Object.keys(gameQuestions)[randomNumber]];
 		$(".displayRoundHere").html(game.round.team + "<br>Round " + game.round.roundNumber + " of " + game.numberOfQuestions);
-		// TODO set the focus on the first input if availalb.e
+		// TODO set the focus on the first input if availalble
 	}
 
 	function checkMultipleChoiceAnswer(clickedId) {
 		if (game.round.correctAnswerStoredIn == clickedId) {
-			console.log("looks like we have the correct answer!");
 			updateScore("correct");
 		}
 		else {
-			console.log("MC answer is incorrect: " + clickedId);
 			updateScore("wrong");
 		}
 		changeTeam();
@@ -427,12 +388,10 @@ $(document).ready(function() {
 		game.round.correctAnswerStoredIn = "";
 		$("#displayTimeHere").html("Time Remaining: " + game.gameTimer.timeConverter(game.roundMaxTime));
 
-		// TODO more here?
 	}
 
 	function getNumberOfQuestionsRemaining() {
 		var numberOfQuestionsRemaining = Object.keys(gameQuestions).length;
-		console.log("Number of questions remaining in this entire deck: " + numberOfQuestionsRemaining);
 		$("#countOfQuestionsRemaining").html("Remaining Questions In Deck: " + numberOfQuestionsRemaining);
 		// TODO move this count somewhere nicer.  
 		return numberOfQuestionsRemaining;
@@ -451,43 +410,46 @@ $(document).ready(function() {
 			game.teams[game.round.team].noAnswer++
 		}
 
+		// TODO revamp this into a grid
+		// <blank> Correct / Incorrect / No answer
+		// Team1Name # / # / # 
+		// Team2Name # / # / #
+		// TeamnName # / # / #
+
 		$("#thisTeamsNameHere").html("Team: " + game.teams[game.round.team].teamName);
 		$("#numberCorrectHere").html("Correct: " + game.teams[game.round.team].correctAnswer);
 		$("#numberWrongHere").html("Wrong: " + game.teams[game.round.team].wrongAnswer);
 		$("#numberNoAnswerHere").html("No Answer: " + game.teams[game.round.team].noAnswer);
-		console.log("answer to be graded: >" + game.round.answerToBeGraded + "< or >" + game.round.needsToBeGraded + "<");
-
-		// TODO show all teams?  We'll have to at the end?  Might as well each round?
-
 
 	}
 
 	function changeTeam() {
 		if (game.numberOfTeams > 1) {
 			var nextTeam = "";
+			var teamFound = false;
 
-			// TODO requires significant amounts of testing.
-			for (var i = 1; i<= game.numberOfTeams; i++) {
-				var teamFound = false;
-				for (var key in game.teams) {
-					console.log("looking for:" + game.round.team + " got: " + key);
-					if (key == game.round.team) {
-						console.log("We found this team - now we need the next team");
-						teamFound = true;
-					}
-					else if (teamFound && nextTeam == "") {
-						game.round.team = key;
-						console.log("Next team is: " + game.round.team);
-					}
-					else {
-						console.log("Back to team 1 since we didn't find a higher teamNumber");
-						game.round.team = "team1";
-					}
+			for (var key in game.teams) {
+				console.log("looking for:" + game.round.team + " got: " + key);
+				if (key == game.round.team) {
+					console.log("We found this team - now we need the next team");
+					teamFound = true;
+				}
+				else if (teamFound) {
+					game.round.team = key;
+					nextTeam = key;
+					console.log("Next team is: " + game.round.team);
+					return false; // break out if we find our next team
+				}
+				else {
+					console.log("These aren't the droids we're looking for... - looking for"  + game.round.team + " got: " + key);
 				}
 			}
-		}
-		else {
-			console.log("We have only 1 team - so no need to change anything");
+			console.log("Team Found: " + teamFound + " next team: " + nextTeam)
+			if (nextTeam == "") {
+				console.log("Back to team 1 since we didn't find a higher teamNumber");
+				game.round.team = "team1";
+				game.round.roundNumber++;
+			}
 		}
 	}
 
@@ -526,7 +488,6 @@ $(document).ready(function() {
 		game.teams.team1.wrongAnswer = 0;
 		game.teams.team1.noAnswer = 0;
 		game.currentQuestion = 0;
-		// TODO reset round here
 	}
 
 	function processAnswerSubmit(e) { // nabbed from: https://stackoverflow.com/questions/5384712/capture-a-form-submit-in-javascript
@@ -592,7 +553,6 @@ $(document).ready(function() {
   		}
   		else {
 	  		if (game.numberOfTeams == 1 || game.numberOfTeams == 0) {
-	  			console.log("we have 0 or 1 as our team request...")
 	  			$("#setupScreen").addClass("hidden");
 	  			game.numberOfTeams = 1;
 	  			createTeams(); // creates the single shell team with a generic name
@@ -605,7 +565,6 @@ $(document).ready(function() {
 	  			return false;
 	  		}
 	  		else {
-	  			console.log("More then 1 team selected... let's create teams");
 	  			$("#teamCreationScreen").removeClass("hidden");
 	  			createTeams();
 	  			setupTeamNameAndMembers();
@@ -624,13 +583,15 @@ $(document).ready(function() {
 		}
 
 	$("#scoreScreen").click(function () {
+		var totalQuestions = game.numberOfTeams * game.numberOfQuestions;
 		$(".displayRoundHere").html(game.round.team + "<br>Round " + game.round.roundNumber + " of " + game.numberOfQuestions);
-		if (game.currentQuestion >= game.numberOfQuestions) {
+		console.log("we're at question: " + game.currentQuestion + " of (in the game):" + totalQuestions);
+		if (game.currentQuestion >= totalQuestions) {
 			console.log("Click to continue:  No, game is over!");
 			$(".gameOver").removeClass("hidden");	
 			game.gameTimer.stop();
 		}
-		else if (game.currentQuestion < game.numberOfQuestions) {			
+		else if (game.currentQuestion < totalQuestions) {			
 			game.gameTimer.pause = false;
 			game.gameTimer.nextQuestion();
 			$("#scoreScreen").addClass("hidden");
@@ -649,6 +610,7 @@ $(document).ready(function() {
 
 	$("#newGameDifferentPeople").click(function () {
 		initializeGame();
+		$("#teamMembersDiv").empty();
 		$(".gameOver").addClass("hidden");
 		$("#scoreScreen").addClass("hidden");
 		$("#numberOfTeams").prop("disabled", false);
@@ -660,6 +622,7 @@ $(document).ready(function() {
 		// console.log("global stop for testing purposes - will be removed later");
 		// console.log(game.teams)
 		console.log(game.round.team)
+		console.log("round: "+ game.round.roundNumber);
 	});
 
 	$(".mc").click(function (event) {

@@ -11,6 +11,12 @@ body {
 	/*color:rgba(255, 255, 255, 1);*/
 }
 
+.mc-answer {
+	margin:10px;
+	border:2px solid black;
+	border-radius: 5px;
+}
+
 .clear-both {
 	clear:both;
 }

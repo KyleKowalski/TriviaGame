@@ -1,11 +1,5 @@
 $(document).ready(function() {
 
-	// TODO:  Advanced setup:  
-		// Setup Teams
-		// Option to only get one question before rotating - GOING WITH THIS METHOD (other is boring for other teams)	
-	
-	// load questions based on above criteria
-	
 	var game = {};
 	var gameQuestions = {};
 	initializeGame();
@@ -115,9 +109,6 @@ $(document).ready(function() {
 	}
 
 	function getQuestionsForGame() {
-			// TODO establish teams (screens and prompts)
-			// TODO select question types dynamically
-			// TODO select number of questions, timer, etc
 			gameQuestions = getAllQuestions(game.questionTypesSelected);	
 	}
 
@@ -134,7 +125,6 @@ $(document).ready(function() {
 	}
 
 	function getAllQuestions(typeOfQuestionArray) {
-		console.log("===== We're in get all questions: =====");
 		var questionObject = {};
 		typeOfQuestionArray.forEach(function(item){
 			var thisItem = item;
@@ -365,7 +355,7 @@ $(document).ready(function() {
 		}
 		// nuke the question so it can't be asked again until we reload the questions - decriment number of questions in game
 		delete gameQuestions[Object.keys(gameQuestions)[randomNumber]];
-		$(".displayRoundHere").html(game.round.team + "<br>Round " + game.round.roundNumber + " of " + game.numberOfQuestions);
+		$(".displayRoundHere").html(game.teams[game.round.team].teamName + "<br>Round " + game.round.roundNumber + " of " + game.numberOfQuestions);
 		// TODO set the focus on the first input if availalble
 	}
 
@@ -481,10 +471,15 @@ $(document).ready(function() {
 	function clearScores() {
 		console.log("loop through teams and reset their scores to zero");
 		// TODO team loop (once teams are ready)
-		game.teams.team1.correctAnswer = 0;
-		game.teams.team1.wrongAnswer = 0;
-		game.teams.team1.noAnswer = 0;
+		game.round.roundNumber = 1;
 		game.currentQuestion = 0;
+
+
+ 		$.each(game.teams, function(key, value) {
+ 			game.teams[key].correctAnswer = 0;
+ 			game.teams[key].wrongAnswer = 0;
+ 			game.teams[key].noAnswer = 0;
+		});
 	}
 
 	function processAnswerSubmit(e) { // nabbed from: https://stackoverflow.com/questions/5384712/capture-a-form-submit-in-javascript
@@ -581,7 +576,7 @@ $(document).ready(function() {
 
 	$("#scoreScreen").click(function () {
 		var totalQuestions = game.numberOfTeams * game.numberOfQuestions;
-		$(".displayRoundHere").html(game.round.team + "<br>Round " + game.round.roundNumber + " of " + game.numberOfQuestions);
+		$(".displayRoundHere").html(game.teams[game.round.team].teamName + "<br>Round " + game.round.roundNumber + " of " + game.numberOfQuestions);
 		console.log("we're at question: " + game.currentQuestion + " of (in the game):" + totalQuestions);
 		if (game.currentQuestion >= totalQuestions) {
 			console.log("Click to continue:  No, game is over!");
